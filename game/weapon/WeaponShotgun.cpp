@@ -24,9 +24,9 @@ protected:
 
 private:
 
-	stateResult_t		State_Idle		( const stateParms_t& parms );
-	stateResult_t		State_Fire		( const stateParms_t& parms );
-	stateResult_t		State_Reload	( const stateParms_t& parms );
+	stateResult_t		State_Idle		  ( const stateParms_t& parms );
+	stateResult_t		State_Fire		  ( const stateParms_t& parms );
+	stateResult_t		State_Reload	  ( const stateParms_t& parms );
 	
 	CLASS_STATES_PROTOTYPE( rvWeaponShotgun );
 };
@@ -126,7 +126,7 @@ stateResult_t rvWeaponShotgun::State_Idle( const stateParms_t& parms ) {
 			if ( wsfl.lowerWeapon ) {
 				SetState( "Lower", 4 );
 				return SRESULT_DONE;
-			}		
+			}
 			if ( !clipSize ) {
 				if ( gameLocal.time > nextAttackTime && wsfl.attack && AmmoAvailable ( ) ) {
 					SetState( "Fire", 0 );
@@ -172,7 +172,7 @@ stateResult_t rvWeaponShotgun::State_Fire( const stateParms_t& parms ) {
 			if ( (!gameLocal.isMultiplayer && (wsfl.lowerWeapon || AnimDone( ANIMCHANNEL_ALL, 0 )) ) || AnimDone( ANIMCHANNEL_ALL, 0 ) ) {
 				SetState( "Idle", 0 );
 				return SRESULT_DONE;
-			}									
+			}
 			if ( wsfl.attack && gameLocal.time >= nextAttackTime && AmmoInClip() ) {
 				SetState( "Fire", 0 );
 				return SRESULT_DONE;
@@ -286,4 +286,3 @@ stateResult_t rvWeaponShotgun::State_Reload ( const stateParms_t& parms ) {
 	}
 	return SRESULT_ERROR;	
 }
-			

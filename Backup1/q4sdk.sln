@@ -1,12 +1,20 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 18
-VisualStudioVersion = 18.2.11415.280 d18.0
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game", "game.vcxproj", "{49BEC5C6-B964-417A-851E-808886B57430}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "game", "game.vcproj", "{49BEC5C6-B964-417A-851E-808886B57430}"
+	ProjectSection(ProjectDependencies) = postProject
+		{49BEC5C6-B964-417A-851E-808886B57400} = {49BEC5C6-B964-417A-851E-808886B57400}
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "idLib", "idlib.vcxproj", "{49BEC5C6-B964-417A-851E-808886B57400}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "idlib", "idlib.vcproj", "{49BEC5C6-B964-417A-851E-808886B57400}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MPGame", "mpgame.vcxproj", "{F2EF9123-B7C3-4F2F-A351-747B595BB534}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mpgame", "mpgame.vcproj", "{F2EF9123-B7C3-4F2F-A351-747B595BB534}"
+	ProjectSection(ProjectDependencies) = postProject
+		{49BEC5C6-B964-417A-851E-808886B57400} = {49BEC5C6-B964-417A-851E-808886B57400}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,8 +44,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {BCD85591-AB46-415B-ABC2-8D32BD0D9D2B}
 	EndGlobalSection
 EndGlobal
