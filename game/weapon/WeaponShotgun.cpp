@@ -21,6 +21,7 @@ public:
 
 protected:
 	int						hitscans;
+	float					spreadZoom;
 
 private:
 
@@ -49,6 +50,7 @@ rvWeaponShotgun::Spawn
 */
 void rvWeaponShotgun::Spawn( void ) {
 	hitscans   = spawnArgs.GetFloat( "hitscans" );
+	spreadZoom = spawnArgs.GetFloat( "spreadZoom" );
 	
 	SetState( "Raise", 0 );	
 }
@@ -164,7 +166,11 @@ stateResult_t rvWeaponShotgun::State_Fire( const stateParms_t& parms ) {
 	switch ( parms.stage ) {
 		case STAGE_INIT:
 			nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier ( PMOD_FIRERATE ));
-			Attack( false, hitscans, spread, 0, 1.0f );
+			if (wsfl.zoom) {
+				Attack(false, hitscans, spreadZoom, 0, 1.0f);
+			} else {
+				Attack(false, hitscans, spread, 0, 1.0f);
+			}
 			PlayAnim( ANIMCHANNEL_ALL, "fire", 0 );	
 			return SRESULT_STAGE( STAGE_WAIT );
 	

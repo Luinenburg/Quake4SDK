@@ -146,6 +146,13 @@ entityDef weapon_shotgun
 	"glightColor"				"1 0 0 1"
 
 	"net_syncPhysics"			"1"
+	
+	// Scope / Zoom
+	"spreadzoom"				"2"
+	"zoomFov"					"50"
+	"zoomTime"					".1"
+	"zoomHideCrosshair"			"0"
+	"gui_zoom"					"guis/weapons/machinegun_scope.gui"
 }
 
 entityDef weapon_shotgun_mp
