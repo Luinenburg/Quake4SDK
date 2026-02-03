@@ -153,6 +153,9 @@ entityDef weapon_shotgun
 	"zoomTime"					".1"
 	"zoomHideCrosshair"			"0"
 	"gui_zoom"					"guis/weapons/machinegun_scope.gui"
+
+	// Nades baby! Kaboom balls!
+	"def_altprojectile"			"projectile_shotty_grenade"
 }
 
 entityDef weapon_shotgun_mp
@@ -380,4 +383,115 @@ entityDef debris_brass_shotgun {
 	"friction"					"0.2"
 	"bouncyness"				"0.1"
 	"snd_bounce"				"shotgun_shell"
+}
+
+//--------------------------------------------------------------------------------------------------------------------
+// Shotty Nade
+//--------------------------------------------------------------------------------------------------------------------
+
+entityDef projectile_shotty_grenade
+{
+	"spawnclass"				"idProjectile"
+	"mins"						"-4 -4 -4"
+	"maxs"						"4 4 4"
+	"cone"						""
+	"noshadows"					"1"
+	"clipmask_largeshot"		"1"
+	
+	"no_contents"				"0"
+								
+	"model"						"models/weapons/grenadelauncher/w_grenade.lwo"
+	"def_damage"				"damage_shotty_grenadeDirect"
+	"def_splash_damage"			"damage_shotty_grenadeSplash"
+																											
+	"speed"						"900"
+	"angular_velocity"			"-10 5 1"
+	"settle_duration"			"0.08"
+	
+	"linear_friction"			"0"
+	"angular_friction"			"0"
+	"contact_friction"			"10"
+	"bounce"					".65"
+	"gravity"					"1"
+	"fuse"						"2.5"
+								
+	"detonate_on_fuse"			"1"
+	"detonate_on_death"			"0"
+	"detonate_on_world"			"0"
+	"detonate_on_actor"			"1"
+	"detonateTestGroundMaterial"	"1"
+								
+	"impact_gib"				"1"								
+	"decal_size"				"75"
+
+	"flyEffectAttenuateSpeed"	"200"
+	
+	"airBurst_desc"				"midair_"
+
+	"fx_fly"				"effects/weapons/grenadelauncher/trail.fx"
+	"fx_fly_mp"				"effects/weapons/grenadelauncher/trail_mp.fx"
+	"fx_detonate"				"effects/weapons/grenadelauncher/detonate.fx"
+	"fx_detonate_mp"			"effects/weapons/rocketlauncher/detonate_mp.fx"
+	"fx_impact"				"effects/weapons/grenadelauncher/impact.fx"
+	"fx_impact_mp"				"effects/weapons/rocketlauncher/impact_mp.fx"
+	"fx_impact_concrete"			"effects/weapons/grenadelauncher/impact_concrete.fx"
+	"fx_impact_concrete_mp"			"effects/weapons/rocketlauncher/impact_mp.fx"
+	"fx_impact_rock"			"effects/weapons/grenadelauncher/impact_concrete.fx"
+	"fx_impact_rock_mp"			"effects/weapons/rocketlauncher/impact_mp.fx"
+	"fx_impact_water"			"effects/ambient/splash_med.fx"
+
+	"friendly_impact"			"1"
+
+	"snd_ricochet"				"grenade_bounce"	
+
+	"net_syncPhysics"			"1"
+}
+
+//--------------------------------------------------------------------------------------------------------------------
+// Damage
+//--------------------------------------------------------------------------------------------------------------------
+
+entityDef damage_shotty_grenadeDirect 
+{
+	"damage"					"100"
+	"gib"						"1"
+
+	"deathPush"					"200"
+	"deathPushMin"				"3000 2000"
+	"deathPushMax"				"5000 3000"
+
+	"pain"						"concussive"
+
+	"cower"						"1"
+}
+
+entityDef damage_shotty_grenadeDirect_mp
+{
+	"inherit"					"damage_shotty_grenadeDirect"
+	"damage"					"80"
+	"knockback"					"80"
+}
+
+entityDef damage_shotty_grenadeSplash 
+{
+	"damage"					"150"
+	"radius"					"200"
+	"knockback"					"80"
+	"push"						"10000"
+	"gib"						"0"
+
+	"deathPush"					"100"
+	"deathPushMin"				"7000 9000"
+	"deathPushMax"				"10000 12000"
+
+	"pain"						"concussive"
+
+	"cower"						"1"
+}
+
+entityDef damage_shotty_grenadeSplash_mp
+{
+	"inherit"					"damage_shotty_grenadeSplash"
+	"damage"					"80"
+	"radius"					"125"
 }

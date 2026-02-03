@@ -70,6 +70,7 @@ rvWeaponShotgun::Restore
 */
 void rvWeaponShotgun::Restore( idRestoreGame *savefile ) {
 	hitscans   = spawnArgs.GetFloat( "hitscans" );
+	spreadZoom = spawnArgs.GetFloat("spreadZoom");
 }
 
 /*
@@ -167,7 +168,7 @@ stateResult_t rvWeaponShotgun::State_Fire( const stateParms_t& parms ) {
 		case STAGE_INIT:
 			nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier ( PMOD_FIRERATE ));
 			if (wsfl.zoom) {
-				Attack(false, hitscans, spreadZoom, 0, 1.0f);
+				Attack(true, 1, spreadZoom, 0, 1.0f);
 			} else {
 				Attack(false, hitscans, spread, 0, 1.0f);
 			}
