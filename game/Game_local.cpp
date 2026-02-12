@@ -4812,6 +4812,7 @@ bool idGameLocal::SpawnEntityDef( const idDict &args, idEntity **ent, bool setDe
 
 	TIME_THIS_SCOPE( __FUNCLINE__);
 	
+
 	if ( ent ) {
 		*ent = NULL;
 	}
@@ -4839,6 +4840,7 @@ bool idGameLocal::SpawnEntityDef( const idDict &args, idEntity **ent, bool setDe
 			Warning( "Unknown classname '%s'%s.", classname, error.c_str() );
 		}
 // RAVEN END
+		Printf("No Def File or Class Name Found. Is the class registered? \n");
 		return false;
 	}
 
