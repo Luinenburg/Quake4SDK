@@ -2122,3 +2122,99 @@ void rvMIRVProjectile::Event_LaunchWarheads( void ) {
 
 }
 // RAVEN END
+
+// Sophia Start
+
+/*
+=============================
+slStickyExplosive
+=============================
+*/
+
+CLASS_DECLARATION(idProjectile, slStickyProjectile)
+END_CLASS
+
+slStickyProjectile::slStickyProjectile() {};
+slStickyProjectile::~slStickyProjectile() {};
+
+void slStickyProjectile::Spawn() {
+	gameLocal.Printf("slSticky Spawned!\n");
+	idProjectile::Spawn();
+}
+
+void slStickyProjectile::Think() {
+	// run physics
+	if (thinkFlags & TH_PHYSICS) {
+
+		// Update the velocity to match the changing speed
+		if (updateVelocity) {
+			idVec3 vel;
+			vel = physicsObj.GetLinearVelocity();
+			vel.Normalize();
+			physicsObj.SetLinearVelocity(speed.GetCurrentValue(gameLocal.time) * vel);
+			if (speed.IsDone(gameLocal.time)) {
+				updateVelocity = false;
+			}
+		}
+
+		// RunPhysics();
+
+		/* Disable fuse
+		// If we werent at rest and are now then start the atrest fuse
+		if (physicsObj.IsAtRest()) {
+			float fuse = spawnArgs.GetFloat("fuse_atrest");
+			if (fuse > 0.0f) {
+				if (spawnArgs.GetBool("detonate_on_fuse")) {
+					CancelEvents(&EV_Explode);
+					PostEventSec(&EV_Explode, fuse);
+				}
+				else {
+					CancelEvents(&EV_Fizzle);
+					PostEventSec(&EV_Fizzle, fuse);
+				}
+			}
+		}
+		*/
+
+		// Stop the trail effect if the physics flag was removed
+		if (flyEffect && flyEffectAttenuateSpeed > 0.0f) {
+			if (physicsObj.IsAtRest()) {
+				flyEffect->Stop();
+				flyEffect = NULL;
+			}
+			else {
+				float speed;
+				speed = idMath::ClampFloat(0, flyEffectAttenuateSpeed, physicsObj.GetLinearVelocity().LengthFast());
+				flyEffect->Attenuate(speed / flyEffectAttenuateSpeed);
+			}
+		}
+
+		UpdateVisualAngles();
+	}
+
+	Present();
+
+	// add the light
+	if (renderLight.lightRadius.x > 0.0f && g_projectileLights.GetBool()) {
+		renderLight.origin = GetPhysics()->GetOrigin() + GetPhysics()->GetAxis() * lightOffset;
+		renderLight.axis = GetPhysics()->GetAxis();
+		if ((lightDefHandle != -1)) {
+			if (lightEndTime > 0 && gameLocal.time <= lightEndTime + gameLocal.GetMSec()) {
+				idVec3 color(255, 0, 0);
+				if (gameLocal.time < lightEndTime) {
+					float frac = (float)(gameLocal.time - lightStartTime) / (float)(lightEndTime - lightStartTime);
+					color.Lerp(lightColor, color, frac);
+				}
+				renderLight.shaderParms[SHADERPARM_RED] = color.x;
+				renderLight.shaderParms[SHADERPARM_GREEN] = color.y;
+				renderLight.shaderParms[SHADERPARM_BLUE] = color.z;
+			}
+			gameRenderWorld->UpdateLightDef(lightDefHandle, &renderLight);
+		}
+		else {
+			lightDefHandle = gameRenderWorld->AddLightDef(&renderLight);
+		}
+	}
+}
+
+// Sophia End

@@ -356,3 +356,18 @@ private:
 #endif /* !__GAME_PROJECTILE_H__ */
 
 // RAVEN END
+
+// Sophia Start
+
+class slStickyProjectile : public idProjectile { 
+	CLASS_PROTOTYPE( slStickyProjectile );
+	
+			slStickyProjectile  ( void );
+			~slStickyProjectile ( void );
+
+	void         Spawn       ( void );
+	virtual void Think       ( void );
+
+};
+
+// Sophia End
