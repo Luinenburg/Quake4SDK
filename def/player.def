@@ -733,7 +733,7 @@ entityDef player_marine
 	"ammo_machinegun"					"0"
 	"ammo_nailgun"						"0"
 	"ammo_blaster"						"-1"
-	"ammo_shotgun"						"0"
+	"ammo_shotgun"						"16"
 	"ammo_hyperblaster"					"0"
 	"ammo_rocketlauncher"					"0"
 	"ammo_grenadelauncher"					"0"
