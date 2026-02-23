@@ -359,15 +359,13 @@ private:
 
 // Sophia Start
 
-class slStickyProjectile : public idProjectile { 
-	CLASS_PROTOTYPE( slStickyProjectile );
+class slFishingBobber : public idProjectile { 
+	CLASS_PROTOTYPE( slFishingBobber );
 	
-			slStickyProjectile  ( void );
-			~slStickyProjectile ( void );
+			slFishingBobber  ( void );
+			~slFishingBobber ( void );
 
-	void         Spawn       ( void );
-	virtual void Think       ( void );
-
+	virtual bool Collide(const trace_t& collision, const idVec3& velocity, bool& hitTeleporter);
 };
 
 // Sophia End
