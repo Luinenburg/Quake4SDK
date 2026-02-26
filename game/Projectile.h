@@ -353,11 +353,19 @@ private:
 	void				Event_LaunchWarheads ( void );
 };
 
-#endif /* !__GAME_PROJECTILE_H__ */
+
 
 // RAVEN END
 
 // Sophia Start
+
+enum FishingSpot {
+	UGLY,
+	DIRTY,
+	ROCKY,
+	METALLIC,
+	FLESHY
+};
 
 class slFishingBobber : public idProjectile { 
 	CLASS_PROTOTYPE( slFishingBobber );
@@ -366,6 +374,12 @@ class slFishingBobber : public idProjectile {
 			~slFishingBobber ( void );
 
 	virtual bool Collide(const trace_t& collision, const idVec3& velocity, bool& hitTeleporter);
+
+private:
+	
+	FishingSpot FishingSpotFromMaterial(const idMaterial* ContactMat);
 };
 
 // Sophia End
+
+#endif /* !__GAME_PROJECTILE_H__ */

@@ -2131,16 +2131,59 @@ slStickyExplosive
 =============================
 */
 
-CLASS_DECLARATION(idProjectile, slFishingBobber)
+CLASS_DECLARATION( idProjectile, slFishingBobber )
 END_CLASS
 
-slFishingBobber::slFishingBobber() {};
-slFishingBobber::~slFishingBobber() {};
+slFishingBobber::slFishingBobber( ) {}
+slFishingBobber::~slFishingBobber( ) {}
+
+bool findInList( const char* source, char* comparisons[] ) {
+	int comparisonLength = sizeof(comparisons) / sizeof(comparisons[0]);
+
+	for ( int i = 0; i < comparisonLength; i++ ) {
+		gameLocal.Printf("%s == %s => %d", source, comparisons[i], strcmp(source, comparisons[i]));
+		if ( !strcmp( source, comparisons[i] ) ) return true;
+	}
+	return false;
+}
+
+FishingSpot slFishingBobber::FishingSpotFromMaterial(const idMaterial* contactMaterial) {
+	const rvDeclMatType*    matType = contactMaterial->GetMaterialType( );
+	const char*             matName = contactMaterial->GetFileName( );
+
+	char* dirtySpots[] = {
+		"dirty",
+		"concrete"
+	};
+	char* rockySpots[] = {
+		"rock",
+		"armor"
+	};
+	char* metallicSpots[] = {
+		"electronics",
+		"solidmetal"
+	};
+	char* fleshySpots[] = {
+		"flesh",
+		"monstermetal"
+	};
+
+	if (matType) {
+		const char* matName = matType->GetName( );
+		if ( findInList( matName, dirtySpots    ) ) return FishingSpot::DIRTY;
+		if ( findInList( matName, rockySpots    ) ) return FishingSpot::ROCKY;
+		if ( findInList( matName, metallicSpots ) ) return FishingSpot::METALLIC;
+		if ( findInList( matName, fleshySpots   ) ) return FishingSpot::FLESHY;
+	}
+	return FishingSpot::UGLY;
+}
 
 bool slFishingBobber::Collide(const trace_t& collision, const idVec3& velocity, bool& hitTeleporter) {
-	if (collision.c.material->GetMaterialType()) gameLocal.Printf("\nMaterialType: %s\n", collision.c.material->GetMaterialType()->GetName());
+	if (collision.c.material->GetMaterialType()) {
+		gameLocal.Printf("FishingSpot: %i\nMaterialType: %s\n", FishingSpotFromMaterial(collision.c.material), collision.c.material->GetMaterialType()->GetName());
+	}
 	else {
-		gameLocal.Printf("\nMaterialType: None\n");
+		gameLocal.Printf("FishingSpot: %i\nMaterialType: %s\n", FishingSpotFromMaterial(collision.c.material), collision.c.material->GetMaterialType()->GetName());
 		if (collision.c.material->GetFileName()) gameLocal.Printf("%s\n", collision.c.material->GetFileName());
 		if (collision.c.material->GetName()) gameLocal.Printf("%s\n", collision.c.material->GetName());
 	}
