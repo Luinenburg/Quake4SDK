@@ -806,6 +806,13 @@ entityDef player_marine
 	"no_fall_delta"						"7" 
 	
 	"def_playerView"					"playerView_marine"
+
+	// FISH
+	"fish_ugly" "0"
+	"fish_dirty" "0"
+	"fish_rocky" "0"
+	"fish_metallic" "0"
+	"fish_fleshy" "0"
 }
 
 entityDef player_strogg
