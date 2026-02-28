@@ -359,12 +359,13 @@ private:
 
 // Sophia Start
 
-enum FishingSpot {
+enum FishType {
 	UGLY,
 	DIRTY,
 	ROCKY,
 	METALLIC,
-	FLESHY
+	FLESHY,
+	n_SIZE
 };
 
 class slFishingBobber : public idProjectile { 
@@ -377,7 +378,7 @@ class slFishingBobber : public idProjectile {
 
 private:
 	
-	FishingSpot FishingSpotFromMaterial(const idMaterial* ContactMat);
+	FishType FishingSpotFromMaterial(const idMaterial* ContactMat);
 };
 
 // Sophia End

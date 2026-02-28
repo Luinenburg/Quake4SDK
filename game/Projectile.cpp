@@ -2147,7 +2147,7 @@ bool findInList( const char* source, char* comparisons[] ) {
 	return false;
 }
 
-FishingSpot slFishingBobber::FishingSpotFromMaterial(const idMaterial* contactMaterial) {
+FishType slFishingBobber::FishingSpotFromMaterial(const idMaterial* contactMaterial) {
 	const rvDeclMatType*    matType = contactMaterial->GetMaterialType( );
 	const char*             matName = contactMaterial->GetFileName( );
 
@@ -2170,12 +2170,12 @@ FishingSpot slFishingBobber::FishingSpotFromMaterial(const idMaterial* contactMa
 
 	if (matType) {
 		const char* matName = matType->GetName( );
-		if ( findInList( matName, dirtySpots    ) ) return FishingSpot::DIRTY;
-		if ( findInList( matName, rockySpots    ) ) return FishingSpot::ROCKY;
-		if ( findInList( matName, metallicSpots ) ) return FishingSpot::METALLIC;
-		if ( findInList( matName, fleshySpots   ) ) return FishingSpot::FLESHY;
+		if ( findInList( matName, dirtySpots    ) ) return FishType::DIRTY;
+		if ( findInList( matName, rockySpots    ) ) return FishType::ROCKY;
+		if ( findInList( matName, metallicSpots ) ) return FishType::METALLIC;
+		if ( findInList( matName, fleshySpots   ) ) return FishType::FLESHY;
 	}
-	return FishingSpot::UGLY;
+	return FishType::UGLY;
 }
 
 bool slFishingBobber::Collide(const trace_t& collision, const idVec3& velocity, bool& hitTeleporter) {
