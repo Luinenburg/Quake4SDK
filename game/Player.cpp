@@ -2013,6 +2013,12 @@ void idPlayer::Spawn( void ) {
 	declManager->FindType( DECL_ENTITYDEF, "damage_telefrag", false, false );
 	declManager->FindType( DECL_ENTITYDEF, "dmg_shellshock", false, false );
 	declManager->FindType( DECL_ENTITYDEF, "dmg_shellshock_nohl", false, false );
+	
+	Fish[FishType::UGLY] = spawnArgs.GetInt("fish_ugly", "0");
+	Fish[FishType::DIRTY] = spawnArgs.GetInt("fish_ugly", "0");
+	Fish[FishType::ROCKY] = spawnArgs.GetInt("fish_ugly", "0");
+	Fish[FishType::METALLIC] = spawnArgs.GetInt("fish_ugly", "0");
+	Fish[FishType::FLESHY] = spawnArgs.GetInt("fish_ugly", "0");
 
 	gibSkin = declManager->FindSkin( spawnArgs.GetString( "skin_gibskin" ) );
 

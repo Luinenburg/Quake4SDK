@@ -3,6 +3,7 @@
 //
 // MERGE_DATE 07/07/2004
 
+#include "Projectile.h"
 #ifndef __GAME_PLAYER_H__
 #define __GAME_PLAYER_H__
 
@@ -1004,6 +1005,9 @@ private:
 	int						oldInventoryWeapons;
 
 	const idDeclEntityDef*	itemCosts;
+
+	// FISH
+	int						Fish[FishType::n_SIZE];
 
 	bool					WantSmoothing( void ) const;
 	void					PredictionErrorDecay( void );
