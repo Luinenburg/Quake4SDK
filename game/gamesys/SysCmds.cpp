@@ -3025,11 +3025,11 @@ void Cmd_ShuffleTeams_f( const idCmdArgs& args ) {
 // Fish
 
 FishType idStrToFish(idStr input) {
-	if (input.Cmp("ugly")) FishType::UGLY;
-	if (input.Cmp("dirty")) FishType::DIRTY;
-	if (input.Cmp("metallic")) FishType::UGLY;
-	if (input.Cmp("rocky")) FishType::ROCKY;
-	if (input.Cmp("fleshy")) FishType::FLESHY;
+	if (input.Cmp("ugly")==0) return FishType::UGLY;
+	if (input.Cmp("dirty")==0) return FishType::DIRTY;
+	if (input.Cmp("metallic")==0) return FishType::UGLY;
+	if (input.Cmp("rocky")==0) return FishType::ROCKY;
+	if (input.Cmp("fleshy")==0) return FishType::FLESHY;
 	return FishType::n_SIZE;
 }
 
@@ -3040,6 +3040,7 @@ void Cmd_GiveFish_f(const idCmdArgs& args) {
 	FishType fish = idStrToFish(strFish);
 	if (fish == FishType::n_SIZE) {
 		gameLocal.Printf("Invalid fish! {ugly, dirty, metallic, rocky, fleshy}");
+		return;
 	}
 	idStr amount = args.Argv(2);
 	player->giveFish(fish, atoi(amount)) ? gameLocal.Printf("Request granted") : gameLocal.Printf("Request not granted");
@@ -3267,8 +3268,8 @@ void idGameLocal::InitConsoleCommands( void ) {
 	cmdSystem->AddCommand( "buyMenu",				Cmd_ToggleBuyMenu_f,		CMD_FL_GAME,				"Toggle buy menu (if in a buy zone and the game type supports it)" );
 	cmdSystem->AddCommand( "buy",					Cmd_BuyItem_f,				CMD_FL_GAME,				"Buy an item (if in a buy zone and the game type supports it)" );
 // RITUAL END
-	cmdSystem->AddCommand("giveFish", Cmd_GiveFish_f, CMD_FL_CHEAT, "Give you fish!");
-	cmdSystem->AddCommand("takeFish", Cmd_TakeFish_f, CMD_FL_CHEAT, "Give god fish!");
+	cmdSystem->AddCommand("giveFish", Cmd_GiveFish_f, CMD_FL_GAME|CMD_FL_CHEAT, "Give you fish!");
+	cmdSystem->AddCommand("takeFish", Cmd_TakeFish_f, CMD_FL_GAME|CMD_FL_CHEAT, "Give god fish!");
 }
 
 /*
