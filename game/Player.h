@@ -797,6 +797,10 @@ public:
 	void					ResetCash();
 // RITUAL END
 
+	// Fish
+	bool					giveFish(FishType fish, int amount = 1);
+	bool					takeFish(FishType fish, int amount = 1);
+
 protected:
 	void					SetupHead( const char* modelKeyName = "", idVec3 headOffset = idVec3(0, 0, 0) );
 

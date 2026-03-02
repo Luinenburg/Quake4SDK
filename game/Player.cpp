@@ -2014,11 +2014,11 @@ void idPlayer::Spawn( void ) {
 	declManager->FindType( DECL_ENTITYDEF, "dmg_shellshock", false, false );
 	declManager->FindType( DECL_ENTITYDEF, "dmg_shellshock_nohl", false, false );
 	
-	Fish[FishType::UGLY] = spawnArgs.GetInt("fish_ugly", "0");
-	Fish[FishType::DIRTY] = spawnArgs.GetInt("fish_ugly", "0");
-	Fish[FishType::ROCKY] = spawnArgs.GetInt("fish_ugly", "0");
-	Fish[FishType::METALLIC] = spawnArgs.GetInt("fish_ugly", "0");
-	Fish[FishType::FLESHY] = spawnArgs.GetInt("fish_ugly", "0");
+	Fish[FishType::UGLY] =		spawnArgs.GetInt("fish_ugly", "0");
+	Fish[FishType::DIRTY] =		spawnArgs.GetInt("fish_dirty", "0");
+	Fish[FishType::ROCKY] =		spawnArgs.GetInt("fish_rocky", "0");
+	Fish[FishType::METALLIC] =	spawnArgs.GetInt("fish_metallic", "0");
+	Fish[FishType::FLESHY] =	spawnArgs.GetInt("fish_fleshy", "0");
 
 	gibSkin = declManager->FindSkin( spawnArgs.GetString( "skin_gibskin" ) );
 
@@ -2336,6 +2336,10 @@ void idPlayer::Save( idSaveGame *savefile ) const {
 	// TOSAVE: const idDeclEntityDef*	cachedWeaponDefs [ MAX_WEAPONS ];	// cnicholson: Save these?
 	// TOSAVE: const idDeclEntityDef*	cachedPowerupDefs [ POWERUP_MAX ];
 
+	// Fish Stuff
+	for (int i = 0; i < FishType::n_SIZE; i++)
+		savefile->WriteInt( Fish[i] );
+
 #ifndef _XENON
  	if ( hud ) {
 		hud->SetStateString( "message", common->GetLocalizedString( "#str_102916" ) );
@@ -2608,6 +2612,10 @@ void idPlayer::Restore( idRestoreGame *savefile ) {
 	savefile->ReadBool( objectivesEnabled );
 
 	savefile->ReadBool( flagCanFire );
+
+	// Fish Stuff
+	for (int i = 0; i < FishType::n_SIZE; i++)
+		savefile->ReadInt(Fish[i]);
 
 	// set the pm_ cvars
 	const idKeyValue	*kv;
@@ -14057,6 +14065,20 @@ void idPlayer::ResetCash()
 	float maxCash = (float) gameLocal.serverInfo.GetInt("si_buyModeMaxCredits");
 	buyMenuCash = (float) gameLocal.serverInfo.GetInt("si_buyModeStartingCredits");
 	ClampCash( minCash, maxCash );
+}
+
+bool idPlayer::giveFish(FishType fish, int amount)
+{
+	if (amount < 0) return false;
+	Fish[fish] += amount;
+	return true;
+}
+
+bool idPlayer::takeFish(FishType fish, int amount)
+{
+	if (Fish[fish] < amount || amount < 0) return false;
+	Fish[fish] -= amount;
+	return true;
 }
 
 /**
