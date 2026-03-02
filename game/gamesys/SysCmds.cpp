@@ -3022,6 +3022,41 @@ void Cmd_ShuffleTeams_f( const idCmdArgs& args ) {
 	gameLocal.mpGame.ShuffleTeams();
 }
 
+// Fish
+
+FishType idStrToFish(idStr input) {
+	if (input.Cmp("ugly")) FishType::UGLY;
+	if (input.Cmp("dirty")) FishType::DIRTY;
+	if (input.Cmp("metallic")) FishType::UGLY;
+	if (input.Cmp("rocky")) FishType::ROCKY;
+	if (input.Cmp("fleshy")) FishType::FLESHY;
+	return FishType::n_SIZE;
+}
+
+void Cmd_GiveFish_f(const idCmdArgs& args) {
+	idPlayer* player;
+	player = gameLocal.GetLocalPlayer();
+	idStr strFish = args.Argv(1);
+	FishType fish = idStrToFish(strFish);
+	if (fish == FishType::n_SIZE) {
+		gameLocal.Printf("Invalid fish! {ugly, dirty, metallic, rocky, fleshy}");
+	}
+	idStr amount = args.Argv(2);
+	player->giveFish(fish, atoi(amount)) ? gameLocal.Printf("Request granted") : gameLocal.Printf("Request not granted");
+}
+
+void Cmd_TakeFish_f(const idCmdArgs& args) {
+	idPlayer* player;
+	player = gameLocal.GetLocalPlayer();
+	idStr strFish = args.Argv(1);
+	FishType fish = idStrToFish(strFish);
+	if (fish == FishType::n_SIZE) {
+		gameLocal.Printf("Invalid fish! {ugly, dirty, metallic, rocky, fleshy}");
+	}
+	idStr amount = args.Argv(2);
+	player->takeFish(fish, atoi(amount)) ? gameLocal.Printf("Request granted") : gameLocal.Printf("Request not granted");
+}
+
 #ifndef _FINAL
 void Cmd_ClientOverflowReliable_f( const idCmdArgs& args ) {
 	idBitMsg	outMsg;
@@ -3232,7 +3267,8 @@ void idGameLocal::InitConsoleCommands( void ) {
 	cmdSystem->AddCommand( "buyMenu",				Cmd_ToggleBuyMenu_f,		CMD_FL_GAME,				"Toggle buy menu (if in a buy zone and the game type supports it)" );
 	cmdSystem->AddCommand( "buy",					Cmd_BuyItem_f,				CMD_FL_GAME,				"Buy an item (if in a buy zone and the game type supports it)" );
 // RITUAL END
-
+	cmdSystem->AddCommand("giveFish", Cmd_GiveFish_f, CMD_FL_CHEAT, "Give you fish!");
+	cmdSystem->AddCommand("takeFish", Cmd_TakeFish_f, CMD_FL_CHEAT, "Give god fish!");
 }
 
 /*
