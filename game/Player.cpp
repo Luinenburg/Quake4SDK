@@ -14081,7 +14081,7 @@ bool idPlayer::takeFish(FishType fish, int amount)
 	return true;
 }
 
-bool idPlayer::grabFish(FishType fish)
+int idPlayer::grabFish(FishType fish)
 {
 	if (fish == FishType::n_SIZE) return -1;
 	return Fish[fish];
