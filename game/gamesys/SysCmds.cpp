@@ -3033,6 +3033,17 @@ FishType idStrToFish(idStr input) {
 	return FishType::n_SIZE;
 }
 
+char* fishToString(FishType fish) {
+	switch (fish) {
+	case UGLY: return "ugly";
+	case DIRTY: return "dirty";
+	case METALLIC: return "metallic";
+	case ROCKY: return "rocky";
+	case FLESHY: return "fleshy";
+	default: return "none";
+	}
+}
+
 void Cmd_GiveFish_f(const idCmdArgs& args) {
 	idPlayer* player;
 	player = gameLocal.GetLocalPlayer();
@@ -3056,6 +3067,13 @@ void Cmd_TakeFish_f(const idCmdArgs& args) {
 	}
 	idStr amount = args.Argv(2);
 	player->takeFish(fish, atoi(amount)) ? gameLocal.Printf("Request granted") : gameLocal.Printf("Request not granted");
+}
+
+void Cmd_DisplayFish_f(const idCmdArgs& args) {
+	idPlayer* player;
+	player = gameLocal.GetLocalPlayer();
+	for (int i = 0; i < FishType::n_SIZE; i++)
+		gameLocal.Printf("%s: %d", fishToString(static_cast<FishType>(i)), player->grabFish(static_cast<FishType>(i)));
 }
 
 #ifndef _FINAL
@@ -3082,194 +3100,195 @@ Let the system know about all of our commands
 so it can perform tab completion
 =================
 */
-void idGameLocal::InitConsoleCommands( void ) {
-// RAVEN BEGIN
-// jscott: typeinfo gone - didn't work, it was unfinished
-//	cmdSystem->AddCommand( "listTypeInfo",			ListTypeInfo_f,				CMD_FL_GAME,				"list type info" );
-//	cmdSystem->AddCommand( "writeGameState",		WriteGameState_f,			CMD_FL_GAME,				"write game state" );
-//	cmdSystem->AddCommand( "testSaveGame",			TestSaveGame_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"test a save game for a level" );
-// RAVEN END
-	cmdSystem->AddCommand( "game_memory",			idClass::DisplayInfo_f,		CMD_FL_GAME,				"displays game class info" );
-	cmdSystem->AddCommand( "listClasses",			idClass::ListClasses_f,		CMD_FL_GAME,				"lists game classes" );
-	cmdSystem->AddCommand( "listThreads",			idThread::ListThreads_f,	CMD_FL_GAME|CMD_FL_CHEAT,	"lists script threads" );
-	cmdSystem->AddCommand( "listEntities",			Cmd_EntityList_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"lists game entities" );
-	cmdSystem->AddCommand( "listClientEntities",	Cmd_ClientEntityList_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"lists client entities" );
-	cmdSystem->AddCommand( "listActiveEntities",	Cmd_ActiveEntityList_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"lists active game entities" );
-	cmdSystem->AddCommand( "listMonsters",			idAI::List_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"lists monsters" );
-	cmdSystem->AddCommand( "listSpawnArgs",			Cmd_ListSpawnArgs_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"list the spawn args of an entity", idGameLocal::ArgCompletion_EntityName );
-	cmdSystem->AddCommand( "say",					Cmd_Say_f,					CMD_FL_GAME,				"text chat" );
-	cmdSystem->AddCommand( "sayTeam",				Cmd_SayTeam_f,				CMD_FL_GAME,				"team text chat" );
-	cmdSystem->AddCommand( "addChatLine",			Cmd_AddChatLine_f,			CMD_FL_GAME,				"internal use - core to game chat lines" );
-	cmdSystem->AddCommand( "gameKick",				Cmd_Kick_f,					CMD_FL_GAME,				"same as kick, but recognizes player names" );
-	cmdSystem->AddCommand( "give",					Cmd_Give_f,					CMD_FL_GAME|CMD_FL_CHEAT,	"gives one or more items" );
-	cmdSystem->AddCommand( "centerview",			Cmd_CenterView_f,			CMD_FL_GAME,				"centers the view" );
-	cmdSystem->AddCommand( "god",					Cmd_God_f,					CMD_FL_GAME|CMD_FL_CHEAT,	"enables god mode" );
-	cmdSystem->AddCommand( "undying",				Cmd_Undying_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"enables undying mode (take damage down to 1 health, but do not die)" );
-	cmdSystem->AddCommand( "notarget",				Cmd_Notarget_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"disables the player as a target" );
-	cmdSystem->AddCommand( "noclip",				Cmd_Noclip_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"disables collision detection for the player" );
-	cmdSystem->AddCommand( "kill",					Cmd_Kill_f,					CMD_FL_GAME,				"kills the player" );
-	cmdSystem->AddCommand( "where",					Cmd_GetViewpos_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"prints the current view position" );
-	cmdSystem->AddCommand( "getviewpos",			Cmd_GetViewpos_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"prints the current view position" );
-	cmdSystem->AddCommand( "setviewpos",			Cmd_SetViewpos_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"sets the current view position" );
-	cmdSystem->AddCommand( "teleport",				Cmd_Teleport_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"teleports the player to an entity location", idGameLocal::ArgCompletion_EntityName );
-	cmdSystem->AddCommand( "trigger",				Cmd_Trigger_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"triggers an entity", idGameLocal::ArgCompletion_EntityName );
-	cmdSystem->AddCommand( "spawn",					Cmd_Spawn_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"spawns a game entity", idCmdSystem::ArgCompletion_Decl<DECL_ENTITYDEF> );
-	cmdSystem->AddCommand( "damage",				Cmd_Damage_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"apply damage to an entity", idGameLocal::ArgCompletion_EntityName );
-	cmdSystem->AddCommand( "remove",				Cmd_Remove_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"removes an entity", idGameLocal::ArgCompletion_EntityName );
-	cmdSystem->AddCommand( "killMonsters",			Cmd_KillMonsters_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"removes all monsters" );
-	cmdSystem->AddCommand( "killMoveables",			Cmd_KillMovables_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"removes all moveables" );
-	cmdSystem->AddCommand( "killRagdolls",			Cmd_KillRagdolls_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"removes all ragdolls" );
-	cmdSystem->AddCommand( "addline",				Cmd_AddDebugLine_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"adds a debug line" );
-	cmdSystem->AddCommand( "addarrow",				Cmd_AddDebugLine_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"adds a debug arrow" );
-	cmdSystem->AddCommand( "removeline",			Cmd_RemoveDebugLine_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"removes a debug line" );
-	cmdSystem->AddCommand( "blinkline",				Cmd_BlinkDebugLine_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"blinks a debug line" );
-	cmdSystem->AddCommand( "listLines",				Cmd_ListDebugLines_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"lists all debug lines" );
-	cmdSystem->AddCommand( "playerModel",			Cmd_PlayerModel_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"sets the given model on the player", idCmdSystem::ArgCompletion_Decl<DECL_MODELDEF> );
-	cmdSystem->AddCommand( "flashlight",			Cmd_Flashlight_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"toggle actor's flashlight", idGameLocal::ArgCompletion_AIName );
-	
-	cmdSystem->AddCommand( "shuffleTeams",			Cmd_ShuffleTeams_f,			CMD_FL_GAME,				"shuffle teams" );
-// RAVEN BEGIN
-// bdube: not using id effect system
-//	cmdSystem->AddCommand( "testFx",				Cmd_TestFx_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"tests an FX system", idCmdSystem::ArgCompletion_Decl<DECL_FX> );
-//	cmdSystem->AddCommand( "testBoneFx",			Cmd_TestBoneFx_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"tests an FX system bound to a joint", idCmdSystem::ArgCompletion_Decl<DECL_FX> );
-// RAVEN END
-	cmdSystem->AddCommand( "testLight",				Cmd_TestLight_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"tests a light" );
-	cmdSystem->AddCommand( "testPointLight",		Cmd_TestPointLight_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"tests a point light" );
-	cmdSystem->AddCommand( "popLight",				Cmd_PopLight_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"removes the last created light" );
-	cmdSystem->AddCommand( "testDeath",				Cmd_TestDeath_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"tests death" );
-	cmdSystem->AddCommand( "testSave",				Cmd_TestSave_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"writes out a test savegame" );
-	cmdSystem->AddCommand( "testModel",				idTestModel::TestModel_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"tests a model", idTestModel::ArgCompletion_TestModel );
-	cmdSystem->AddCommand( "testSkin",				idTestModel::TestSkin_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"tests a skin on an existing testModel", idCmdSystem::ArgCompletion_Decl<DECL_SKIN> );
-	cmdSystem->AddCommand( "testShaderParm",		idTestModel::TestShaderParm_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"sets a shaderParm on an existing testModel" );
-	cmdSystem->AddCommand( "keepTestModel",			idTestModel::KeepTestModel_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"keeps the last test model in the game" );
-	cmdSystem->AddCommand( "testAnim",				idTestModel::TestAnim_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"tests an animation", idTestModel::ArgCompletion_TestAnim );
-	cmdSystem->AddCommand( "testParticleStopTime",	idTestModel::TestParticleStopTime_f,CMD_FL_GAME|CMD_FL_CHEAT,	"tests particle stop time on a test model" );
-	cmdSystem->AddCommand( "nextAnim",				idTestModel::TestModelNextAnim_f,	CMD_FL_GAME|CMD_FL_CHEAT,	"shows next animation on test model" );
-	cmdSystem->AddCommand( "prevAnim",				idTestModel::TestModelPrevAnim_f,	CMD_FL_GAME|CMD_FL_CHEAT,	"shows previous animation on test model" );
-	cmdSystem->AddCommand( "nextFrame",				idTestModel::TestModelNextFrame_f,	CMD_FL_GAME|CMD_FL_CHEAT,	"shows next animation frame on test model" );
-	cmdSystem->AddCommand( "prevFrame",				idTestModel::TestModelPrevFrame_f,	CMD_FL_GAME|CMD_FL_CHEAT,	"shows previous animation frame on test model" );
-	cmdSystem->AddCommand( "testBlend",				idTestModel::TestBlend_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"tests animation blending" );
-	cmdSystem->AddCommand( "reloadScript",			Cmd_ReloadScript_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"reloads scripts" );
-	cmdSystem->AddCommand( "script",				Cmd_Script_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"executes a line of script" );
-	cmdSystem->AddCommand( "listCollisionModels",	Cmd_ListCollisionModels_f,	CMD_FL_GAME,				"lists collision models" );
-	cmdSystem->AddCommand( "collisionModelInfo",	Cmd_CollisionModelInfo_f,	CMD_FL_GAME,				"shows collision model info" );
-	cmdSystem->AddCommand( "reexportmodels",		Cmd_ReexportModels_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"reexports models", ArgCompletion_DefFile );
-	cmdSystem->AddCommand( "reloadanims",			Cmd_ReloadAnims_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"reloads animations" );
-	cmdSystem->AddCommand( "listAnims",				Cmd_ListAnims_f,			CMD_FL_GAME,				"lists all animations" );
-	cmdSystem->AddCommand( "aasStats",				Cmd_AASStats_f,				CMD_FL_GAME,				"shows AAS stats" );
-	cmdSystem->AddCommand( "testDamage",			Cmd_TestDamage_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"tests a damage def", idCmdSystem::ArgCompletion_Decl<DECL_ENTITYDEF> );
-	cmdSystem->AddCommand( "weaponSplat",			Cmd_WeaponSplat_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"projects a blood splat on the player weapon" );
-	cmdSystem->AddCommand( "saveSelected",			Cmd_SaveSelected_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"saves the selected entity to the .map file" );
-	cmdSystem->AddCommand( "deleteSelected",		Cmd_DeleteSelected_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"deletes selected entity" );
-	cmdSystem->AddCommand( "saveMoveables",			Cmd_SaveMoveables_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"save all moveables to the .map file" );
-	cmdSystem->AddCommand( "saveRagdolls",			Cmd_SaveRagdolls_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"save all ragdoll poses to the .map file" );
-	cmdSystem->AddCommand( "bindRagdoll",			Cmd_BindRagdoll_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"binds ragdoll at the current drag position" );
-	cmdSystem->AddCommand( "unbindRagdoll",			Cmd_UnbindRagdoll_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"unbinds the selected ragdoll" );
-	cmdSystem->AddCommand( "saveLights",			Cmd_SaveLights_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"saves all lights to the .map file" );
-	cmdSystem->AddCommand( "saveParticles",			Cmd_SaveParticles_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"saves all lights to the .map file" );
-	cmdSystem->AddCommand( "clearLights",			Cmd_ClearLights_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"clears all lights" );
-	cmdSystem->AddCommand( "gameError",				Cmd_GameError_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"causes a game error" );
+void idGameLocal::InitConsoleCommands(void) {
+	// RAVEN BEGIN
+	// jscott: typeinfo gone - didn't work, it was unfinished
+	//	cmdSystem->AddCommand( "listTypeInfo",			ListTypeInfo_f,				CMD_FL_GAME,				"list type info" );
+	//	cmdSystem->AddCommand( "writeGameState",		WriteGameState_f,			CMD_FL_GAME,				"write game state" );
+	//	cmdSystem->AddCommand( "testSaveGame",			TestSaveGame_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"test a save game for a level" );
+	// RAVEN END
+	cmdSystem->AddCommand("game_memory", idClass::DisplayInfo_f, CMD_FL_GAME, "displays game class info");
+	cmdSystem->AddCommand("listClasses", idClass::ListClasses_f, CMD_FL_GAME, "lists game classes");
+	cmdSystem->AddCommand("listThreads", idThread::ListThreads_f, CMD_FL_GAME | CMD_FL_CHEAT, "lists script threads");
+	cmdSystem->AddCommand("listEntities", Cmd_EntityList_f, CMD_FL_GAME | CMD_FL_CHEAT, "lists game entities");
+	cmdSystem->AddCommand("listClientEntities", Cmd_ClientEntityList_f, CMD_FL_GAME | CMD_FL_CHEAT, "lists client entities");
+	cmdSystem->AddCommand("listActiveEntities", Cmd_ActiveEntityList_f, CMD_FL_GAME | CMD_FL_CHEAT, "lists active game entities");
+	cmdSystem->AddCommand("listMonsters", idAI::List_f, CMD_FL_GAME | CMD_FL_CHEAT, "lists monsters");
+	cmdSystem->AddCommand("listSpawnArgs", Cmd_ListSpawnArgs_f, CMD_FL_GAME | CMD_FL_CHEAT, "list the spawn args of an entity", idGameLocal::ArgCompletion_EntityName);
+	cmdSystem->AddCommand("say", Cmd_Say_f, CMD_FL_GAME, "text chat");
+	cmdSystem->AddCommand("sayTeam", Cmd_SayTeam_f, CMD_FL_GAME, "team text chat");
+	cmdSystem->AddCommand("addChatLine", Cmd_AddChatLine_f, CMD_FL_GAME, "internal use - core to game chat lines");
+	cmdSystem->AddCommand("gameKick", Cmd_Kick_f, CMD_FL_GAME, "same as kick, but recognizes player names");
+	cmdSystem->AddCommand("give", Cmd_Give_f, CMD_FL_GAME | CMD_FL_CHEAT, "gives one or more items");
+	cmdSystem->AddCommand("centerview", Cmd_CenterView_f, CMD_FL_GAME, "centers the view");
+	cmdSystem->AddCommand("god", Cmd_God_f, CMD_FL_GAME | CMD_FL_CHEAT, "enables god mode");
+	cmdSystem->AddCommand("undying", Cmd_Undying_f, CMD_FL_GAME | CMD_FL_CHEAT, "enables undying mode (take damage down to 1 health, but do not die)");
+	cmdSystem->AddCommand("notarget", Cmd_Notarget_f, CMD_FL_GAME | CMD_FL_CHEAT, "disables the player as a target");
+	cmdSystem->AddCommand("noclip", Cmd_Noclip_f, CMD_FL_GAME | CMD_FL_CHEAT, "disables collision detection for the player");
+	cmdSystem->AddCommand("kill", Cmd_Kill_f, CMD_FL_GAME, "kills the player");
+	cmdSystem->AddCommand("where", Cmd_GetViewpos_f, CMD_FL_GAME | CMD_FL_CHEAT, "prints the current view position");
+	cmdSystem->AddCommand("getviewpos", Cmd_GetViewpos_f, CMD_FL_GAME | CMD_FL_CHEAT, "prints the current view position");
+	cmdSystem->AddCommand("setviewpos", Cmd_SetViewpos_f, CMD_FL_GAME | CMD_FL_CHEAT, "sets the current view position");
+	cmdSystem->AddCommand("teleport", Cmd_Teleport_f, CMD_FL_GAME | CMD_FL_CHEAT, "teleports the player to an entity location", idGameLocal::ArgCompletion_EntityName);
+	cmdSystem->AddCommand("trigger", Cmd_Trigger_f, CMD_FL_GAME | CMD_FL_CHEAT, "triggers an entity", idGameLocal::ArgCompletion_EntityName);
+	cmdSystem->AddCommand("spawn", Cmd_Spawn_f, CMD_FL_GAME | CMD_FL_CHEAT, "spawns a game entity", idCmdSystem::ArgCompletion_Decl<DECL_ENTITYDEF>);
+	cmdSystem->AddCommand("damage", Cmd_Damage_f, CMD_FL_GAME | CMD_FL_CHEAT, "apply damage to an entity", idGameLocal::ArgCompletion_EntityName);
+	cmdSystem->AddCommand("remove", Cmd_Remove_f, CMD_FL_GAME | CMD_FL_CHEAT, "removes an entity", idGameLocal::ArgCompletion_EntityName);
+	cmdSystem->AddCommand("killMonsters", Cmd_KillMonsters_f, CMD_FL_GAME | CMD_FL_CHEAT, "removes all monsters");
+	cmdSystem->AddCommand("killMoveables", Cmd_KillMovables_f, CMD_FL_GAME | CMD_FL_CHEAT, "removes all moveables");
+	cmdSystem->AddCommand("killRagdolls", Cmd_KillRagdolls_f, CMD_FL_GAME | CMD_FL_CHEAT, "removes all ragdolls");
+	cmdSystem->AddCommand("addline", Cmd_AddDebugLine_f, CMD_FL_GAME | CMD_FL_CHEAT, "adds a debug line");
+	cmdSystem->AddCommand("addarrow", Cmd_AddDebugLine_f, CMD_FL_GAME | CMD_FL_CHEAT, "adds a debug arrow");
+	cmdSystem->AddCommand("removeline", Cmd_RemoveDebugLine_f, CMD_FL_GAME | CMD_FL_CHEAT, "removes a debug line");
+	cmdSystem->AddCommand("blinkline", Cmd_BlinkDebugLine_f, CMD_FL_GAME | CMD_FL_CHEAT, "blinks a debug line");
+	cmdSystem->AddCommand("listLines", Cmd_ListDebugLines_f, CMD_FL_GAME | CMD_FL_CHEAT, "lists all debug lines");
+	cmdSystem->AddCommand("playerModel", Cmd_PlayerModel_f, CMD_FL_GAME | CMD_FL_CHEAT, "sets the given model on the player", idCmdSystem::ArgCompletion_Decl<DECL_MODELDEF>);
+	cmdSystem->AddCommand("flashlight", Cmd_Flashlight_f, CMD_FL_GAME | CMD_FL_CHEAT, "toggle actor's flashlight", idGameLocal::ArgCompletion_AIName);
 
-// RAVEN BEGIN
-// rjohnson: entity usage stats
-	cmdSystem->AddCommand( "listEntityStats",		Cmd_ListEntityStats_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"lists global entity stats" );
-// ddynerman: mp spawning test command
-	cmdSystem->AddCommand( "evaluateMPPerformance",	Cmd_EvaluateMPPerformance_f,CMD_FL_GAME|CMD_FL_CHEAT,	"spawns serveral player models", idCmdSystem::ArgCompletion_Decl<DECL_ENTITYDEF> );
-	cmdSystem->AddCommand( "listMapEntities",		idGameLocal::Cmd_PrintMapEntityNumbers_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"lists map entity numbers" );
-	cmdSystem->AddCommand( "listSpawnIds",			idGameLocal::Cmd_PrintSpawnIds_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"lists map entity numbers" );
-// RAVEN END
+	cmdSystem->AddCommand("shuffleTeams", Cmd_ShuffleTeams_f, CMD_FL_GAME, "shuffle teams");
+	// RAVEN BEGIN
+	// bdube: not using id effect system
+	//	cmdSystem->AddCommand( "testFx",				Cmd_TestFx_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"tests an FX system", idCmdSystem::ArgCompletion_Decl<DECL_FX> );
+	//	cmdSystem->AddCommand( "testBoneFx",			Cmd_TestBoneFx_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"tests an FX system bound to a joint", idCmdSystem::ArgCompletion_Decl<DECL_FX> );
+	// RAVEN END
+	cmdSystem->AddCommand("testLight", Cmd_TestLight_f, CMD_FL_GAME | CMD_FL_CHEAT, "tests a light");
+	cmdSystem->AddCommand("testPointLight", Cmd_TestPointLight_f, CMD_FL_GAME | CMD_FL_CHEAT, "tests a point light");
+	cmdSystem->AddCommand("popLight", Cmd_PopLight_f, CMD_FL_GAME | CMD_FL_CHEAT, "removes the last created light");
+	cmdSystem->AddCommand("testDeath", Cmd_TestDeath_f, CMD_FL_GAME | CMD_FL_CHEAT, "tests death");
+	cmdSystem->AddCommand("testSave", Cmd_TestSave_f, CMD_FL_GAME | CMD_FL_CHEAT, "writes out a test savegame");
+	cmdSystem->AddCommand("testModel", idTestModel::TestModel_f, CMD_FL_GAME | CMD_FL_CHEAT, "tests a model", idTestModel::ArgCompletion_TestModel);
+	cmdSystem->AddCommand("testSkin", idTestModel::TestSkin_f, CMD_FL_GAME | CMD_FL_CHEAT, "tests a skin on an existing testModel", idCmdSystem::ArgCompletion_Decl<DECL_SKIN>);
+	cmdSystem->AddCommand("testShaderParm", idTestModel::TestShaderParm_f, CMD_FL_GAME | CMD_FL_CHEAT, "sets a shaderParm on an existing testModel");
+	cmdSystem->AddCommand("keepTestModel", idTestModel::KeepTestModel_f, CMD_FL_GAME | CMD_FL_CHEAT, "keeps the last test model in the game");
+	cmdSystem->AddCommand("testAnim", idTestModel::TestAnim_f, CMD_FL_GAME | CMD_FL_CHEAT, "tests an animation", idTestModel::ArgCompletion_TestAnim);
+	cmdSystem->AddCommand("testParticleStopTime", idTestModel::TestParticleStopTime_f, CMD_FL_GAME | CMD_FL_CHEAT, "tests particle stop time on a test model");
+	cmdSystem->AddCommand("nextAnim", idTestModel::TestModelNextAnim_f, CMD_FL_GAME | CMD_FL_CHEAT, "shows next animation on test model");
+	cmdSystem->AddCommand("prevAnim", idTestModel::TestModelPrevAnim_f, CMD_FL_GAME | CMD_FL_CHEAT, "shows previous animation on test model");
+	cmdSystem->AddCommand("nextFrame", idTestModel::TestModelNextFrame_f, CMD_FL_GAME | CMD_FL_CHEAT, "shows next animation frame on test model");
+	cmdSystem->AddCommand("prevFrame", idTestModel::TestModelPrevFrame_f, CMD_FL_GAME | CMD_FL_CHEAT, "shows previous animation frame on test model");
+	cmdSystem->AddCommand("testBlend", idTestModel::TestBlend_f, CMD_FL_GAME | CMD_FL_CHEAT, "tests animation blending");
+	cmdSystem->AddCommand("reloadScript", Cmd_ReloadScript_f, CMD_FL_GAME | CMD_FL_CHEAT, "reloads scripts");
+	cmdSystem->AddCommand("script", Cmd_Script_f, CMD_FL_GAME | CMD_FL_CHEAT, "executes a line of script");
+	cmdSystem->AddCommand("listCollisionModels", Cmd_ListCollisionModels_f, CMD_FL_GAME, "lists collision models");
+	cmdSystem->AddCommand("collisionModelInfo", Cmd_CollisionModelInfo_f, CMD_FL_GAME, "shows collision model info");
+	cmdSystem->AddCommand("reexportmodels", Cmd_ReexportModels_f, CMD_FL_GAME | CMD_FL_CHEAT, "reexports models", ArgCompletion_DefFile);
+	cmdSystem->AddCommand("reloadanims", Cmd_ReloadAnims_f, CMD_FL_GAME | CMD_FL_CHEAT, "reloads animations");
+	cmdSystem->AddCommand("listAnims", Cmd_ListAnims_f, CMD_FL_GAME, "lists all animations");
+	cmdSystem->AddCommand("aasStats", Cmd_AASStats_f, CMD_FL_GAME, "shows AAS stats");
+	cmdSystem->AddCommand("testDamage", Cmd_TestDamage_f, CMD_FL_GAME | CMD_FL_CHEAT, "tests a damage def", idCmdSystem::ArgCompletion_Decl<DECL_ENTITYDEF>);
+	cmdSystem->AddCommand("weaponSplat", Cmd_WeaponSplat_f, CMD_FL_GAME | CMD_FL_CHEAT, "projects a blood splat on the player weapon");
+	cmdSystem->AddCommand("saveSelected", Cmd_SaveSelected_f, CMD_FL_GAME | CMD_FL_CHEAT, "saves the selected entity to the .map file");
+	cmdSystem->AddCommand("deleteSelected", Cmd_DeleteSelected_f, CMD_FL_GAME | CMD_FL_CHEAT, "deletes selected entity");
+	cmdSystem->AddCommand("saveMoveables", Cmd_SaveMoveables_f, CMD_FL_GAME | CMD_FL_CHEAT, "save all moveables to the .map file");
+	cmdSystem->AddCommand("saveRagdolls", Cmd_SaveRagdolls_f, CMD_FL_GAME | CMD_FL_CHEAT, "save all ragdoll poses to the .map file");
+	cmdSystem->AddCommand("bindRagdoll", Cmd_BindRagdoll_f, CMD_FL_GAME | CMD_FL_CHEAT, "binds ragdoll at the current drag position");
+	cmdSystem->AddCommand("unbindRagdoll", Cmd_UnbindRagdoll_f, CMD_FL_GAME | CMD_FL_CHEAT, "unbinds the selected ragdoll");
+	cmdSystem->AddCommand("saveLights", Cmd_SaveLights_f, CMD_FL_GAME | CMD_FL_CHEAT, "saves all lights to the .map file");
+	cmdSystem->AddCommand("saveParticles", Cmd_SaveParticles_f, CMD_FL_GAME | CMD_FL_CHEAT, "saves all lights to the .map file");
+	cmdSystem->AddCommand("clearLights", Cmd_ClearLights_f, CMD_FL_GAME | CMD_FL_CHEAT, "clears all lights");
+	cmdSystem->AddCommand("gameError", Cmd_GameError_f, CMD_FL_GAME | CMD_FL_CHEAT, "causes a game error");
+
+	// RAVEN BEGIN
+	// rjohnson: entity usage stats
+	cmdSystem->AddCommand("listEntityStats", Cmd_ListEntityStats_f, CMD_FL_GAME | CMD_FL_CHEAT, "lists global entity stats");
+	// ddynerman: mp spawning test command
+	cmdSystem->AddCommand("evaluateMPPerformance", Cmd_EvaluateMPPerformance_f, CMD_FL_GAME | CMD_FL_CHEAT, "spawns serveral player models", idCmdSystem::ArgCompletion_Decl<DECL_ENTITYDEF>);
+	cmdSystem->AddCommand("listMapEntities", idGameLocal::Cmd_PrintMapEntityNumbers_f, CMD_FL_GAME | CMD_FL_CHEAT, "lists map entity numbers");
+	cmdSystem->AddCommand("listSpawnIds", idGameLocal::Cmd_PrintSpawnIds_f, CMD_FL_GAME | CMD_FL_CHEAT, "lists map entity numbers");
+	// RAVEN END
 
 #ifndef	ID_DEMO_BUILD
-	cmdSystem->AddCommand( "disasmScript",			Cmd_DisasmScript_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"disassembles script" );
-// RAVEN BEGIN
-// rjohnson: removed old not taking system
-/*
-	cmdSystem->AddCommand( "recordViewNotes",		Cmd_RecordViewNotes_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"record the current view position with notes" );
-	cmdSystem->AddCommand( "showViewNotes",			Cmd_ShowViewNotes_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"show any view notes for the current map, successive calls will cycle to the next note" );
-	cmdSystem->AddCommand( "closeViewNotes",		Cmd_CloseViewNotes_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"close the view showing any notes for this map" );
-*/
-// RAVEN END
-	cmdSystem->AddCommand( "exportmodels",			Cmd_ExportModels_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"exports models", ArgCompletion_DefFile );
+	cmdSystem->AddCommand("disasmScript", Cmd_DisasmScript_f, CMD_FL_GAME | CMD_FL_CHEAT, "disassembles script");
+	// RAVEN BEGIN
+	// rjohnson: removed old not taking system
+	/*
+		cmdSystem->AddCommand( "recordViewNotes",		Cmd_RecordViewNotes_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"record the current view position with notes" );
+		cmdSystem->AddCommand( "showViewNotes",			Cmd_ShowViewNotes_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"show any view notes for the current map, successive calls will cycle to the next note" );
+		cmdSystem->AddCommand( "closeViewNotes",		Cmd_CloseViewNotes_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"close the view showing any notes for this map" );
+	*/
+	// RAVEN END
+	cmdSystem->AddCommand("exportmodels", Cmd_ExportModels_f, CMD_FL_GAME | CMD_FL_CHEAT, "exports models", ArgCompletion_DefFile);
 
 	// multiplayer client commands ( replaces old impulses stuff )
 	//cmdSystem->AddCommand( "clientDropWeapon",		idMultiplayerGame::DropWeapon_f, CMD_FL_GAME,			"drop current weapon" );
-	cmdSystem->AddCommand( "clientMessageMode",		idMultiplayerGame::MessageMode_f, CMD_FL_GAME,			"ingame gui message mode" );
+	cmdSystem->AddCommand("clientMessageMode", idMultiplayerGame::MessageMode_f, CMD_FL_GAME, "ingame gui message mode");
 	// FIXME: implement
-	cmdSystem->AddCommand( "clientVote",			idMultiplayerGame::Vote_f,	CMD_FL_GAME,				"cast your vote: clientVote yes | no" );
-	cmdSystem->AddCommand( "clientCallVote",		idMultiplayerGame::CallVote_f,	CMD_FL_GAME,			"call a vote: clientCallVote si_.. proposed_value" );
-	cmdSystem->AddCommand( "clientVoiceChat",		idMultiplayerGame::VoiceChat_f,	CMD_FL_GAME,			"voice chats: clientVoiceChat <sound shader>" );
-	cmdSystem->AddCommand( "clientVoiceChatTeam",	idMultiplayerGame::VoiceChatTeam_f,	CMD_FL_GAME,		"team voice chats: clientVoiceChat <sound shader>" );
-// RAVEN BEGIN
-	// jshepard
-	cmdSystem->AddCommand( "forceTeamChange",				idMultiplayerGame::ForceTeamChange_f,			CMD_FL_GAME,		"force team change: forceTeamChange <id>" );
-	cmdSystem->AddCommand( "removeClientFromBanList",		idMultiplayerGame::RemoveClientFromBanList_f,	CMD_FL_GAME,		"removes a client id from the ban list: removeClientFromBanList <client id>" );
+	cmdSystem->AddCommand("clientVote", idMultiplayerGame::Vote_f, CMD_FL_GAME, "cast your vote: clientVote yes | no");
+	cmdSystem->AddCommand("clientCallVote", idMultiplayerGame::CallVote_f, CMD_FL_GAME, "call a vote: clientCallVote si_.. proposed_value");
+	cmdSystem->AddCommand("clientVoiceChat", idMultiplayerGame::VoiceChat_f, CMD_FL_GAME, "voice chats: clientVoiceChat <sound shader>");
+	cmdSystem->AddCommand("clientVoiceChatTeam", idMultiplayerGame::VoiceChatTeam_f, CMD_FL_GAME, "team voice chats: clientVoiceChat <sound shader>");
+	// RAVEN BEGIN
+		// jshepard
+	cmdSystem->AddCommand("forceTeamChange", idMultiplayerGame::ForceTeamChange_f, CMD_FL_GAME, "force team change: forceTeamChange <id>");
+	cmdSystem->AddCommand("removeClientFromBanList", idMultiplayerGame::RemoveClientFromBanList_f, CMD_FL_GAME, "removes a client id from the ban list: removeClientFromBanList <client id>");
 
 #ifndef _XBOX
-// shouchard:  more voice chat stuff (non-XBOX)
-	cmdSystem->AddCommand( "clientvoicemute",		idMultiplayerGame::VoiceMute_f, CMD_FL_GAME,			"mute the specified player's incoming voicechat" );
-	cmdSystem->AddCommand( "clientvoiceunmute",		idMultiplayerGame::VoiceUnmute_f, CMD_FL_GAME,			"unmute the specified player's incoming voicechat" );
+	// shouchard:  more voice chat stuff (non-XBOX)
+	cmdSystem->AddCommand("clientvoicemute", idMultiplayerGame::VoiceMute_f, CMD_FL_GAME, "mute the specified player's incoming voicechat");
+	cmdSystem->AddCommand("clientvoiceunmute", idMultiplayerGame::VoiceUnmute_f, CMD_FL_GAME, "unmute the specified player's incoming voicechat");
 #endif // _XBOX
-// RAVEN END
+	// RAVEN END
 
-	// multiplayer server commands
-	cmdSystem->AddCommand( "verifyServerSettings",	idGameLocal::VerifyServerSettings_f,	CMD_FL_GAME,	"verifies the game type can be played on the map" );
-	cmdSystem->AddCommand( "serverMapRestart",		idGameLocal::MapRestart_f,	CMD_FL_GAME,				"restart the current game" );
-	cmdSystem->AddCommand( "serverForceReady",		idMultiplayerGame::ForceReady_f,CMD_FL_GAME,				"force all players ready" );
-	cmdSystem->AddCommand( "serverNextMap",			idGameLocal::NextMap_f,		CMD_FL_GAME,				"change to the next map" );
+		// multiplayer server commands
+	cmdSystem->AddCommand("verifyServerSettings", idGameLocal::VerifyServerSettings_f, CMD_FL_GAME, "verifies the game type can be played on the map");
+	cmdSystem->AddCommand("serverMapRestart", idGameLocal::MapRestart_f, CMD_FL_GAME, "restart the current game");
+	cmdSystem->AddCommand("serverForceReady", idMultiplayerGame::ForceReady_f, CMD_FL_GAME, "force all players ready");
+	cmdSystem->AddCommand("serverNextMap", idGameLocal::NextMap_f, CMD_FL_GAME, "change to the next map");
 #endif
 
-	cmdSystem->AddCommand( "CheckTeamBalance", idMultiplayerGame::CheckTeamBalance_f, CMD_FL_GAME, "helper for team switching in the guis - <team to switch to> <named event for yes> <named event for no> <named event for same team>" );
+	cmdSystem->AddCommand("CheckTeamBalance", idMultiplayerGame::CheckTeamBalance_f, CMD_FL_GAME, "helper for team switching in the guis - <team to switch to> <named event for yes> <named event for no> <named event for same team>");
 
 	// localization help commands
-	cmdSystem->AddCommand( "nextGUI",				Cmd_NextGUI_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"teleport the player to the next func_static with a gui" );
-	cmdSystem->AddCommand( "testid",				Cmd_TestId_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"output the string for the specified id." );
+	cmdSystem->AddCommand("nextGUI", Cmd_NextGUI_f, CMD_FL_GAME | CMD_FL_CHEAT, "teleport the player to the next func_static with a gui");
+	cmdSystem->AddCommand("testid", Cmd_TestId_f, CMD_FL_GAME | CMD_FL_CHEAT, "output the string for the specified id.");
 
-// RAVEN BEGIN
-// bdube: vehicle code
-	cmdSystem->AddCommand( "killVehicles",			Cmd_KillVehicles_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"kills all vehicles" );
-	cmdSystem->AddCommand( "killMessage",			Cmd_KillMessage_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"prints a fake death message" );
-	cmdSystem->AddCommand( "apState",				Cmd_APState_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"prints AP state" );
-// bdube: jump points
-	cmdSystem->AddCommand( "jump",					Cmd_DebugJump_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"jumps to a specific debug jump point" );
-	cmdSystem->AddCommand( "nextjumppoint",			Cmd_DebugNextJumpPoint_f,	CMD_FL_GAME|CMD_FL_CHEAT,	"jumps to the next debug jump point " );
-	cmdSystem->AddCommand( "prevjumppoint",			Cmd_DebugPrevJumpPoint_f,	CMD_FL_GAME|CMD_FL_CHEAT,	"jumps to the previous debug jump point" );
-// cdr: Added Extract Tactical
-	cmdSystem->AddCommand( "extract_tactical",		Cmd_AASExtractTactical_f,	CMD_FL_GAME,				"pulls tactical information for the current position." );
-// RAVEN END
+	// RAVEN BEGIN
+	// bdube: vehicle code
+	cmdSystem->AddCommand("killVehicles", Cmd_KillVehicles_f, CMD_FL_GAME | CMD_FL_CHEAT, "kills all vehicles");
+	cmdSystem->AddCommand("killMessage", Cmd_KillMessage_f, CMD_FL_GAME | CMD_FL_CHEAT, "prints a fake death message");
+	cmdSystem->AddCommand("apState", Cmd_APState_f, CMD_FL_GAME | CMD_FL_CHEAT, "prints AP state");
+	// bdube: jump points
+	cmdSystem->AddCommand("jump", Cmd_DebugJump_f, CMD_FL_GAME | CMD_FL_CHEAT, "jumps to a specific debug jump point");
+	cmdSystem->AddCommand("nextjumppoint", Cmd_DebugNextJumpPoint_f, CMD_FL_GAME | CMD_FL_CHEAT, "jumps to the next debug jump point ");
+	cmdSystem->AddCommand("prevjumppoint", Cmd_DebugPrevJumpPoint_f, CMD_FL_GAME | CMD_FL_CHEAT, "jumps to the previous debug jump point");
+	// cdr: Added Extract Tactical
+	cmdSystem->AddCommand("extract_tactical", Cmd_AASExtractTactical_f, CMD_FL_GAME, "pulls tactical information for the current position.");
+	// RAVEN END
 
-// RAVEN BEGIN
-// abahr
-	cmdSystem->AddCommand( "call",					Cmd_CallScriptFunc_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"calls script function and prints out return val" );
-	cmdSystem->AddCommand( "setPlayerGravity",		Cmd_SetPlayerGravity_f,		CMD_FL_GAME|CMD_FL_CHEAT,	"sets players local gravity" );
-// cdr
-	cmdSystem->AddCommand( "ai_debugFilter",		Cmd_AI_DebugFilter_f,		CMD_FL_GAME,				"ai_debugMove and ai_debugTactical only work on the specified entity (if none, does one you're looking at)", idGameLocal::ArgCompletion_AIName );
-// ddynerman: multiple arena/CW stuff
-	cmdSystem->AddCommand( "setInstance",			Cmd_SetInstance_f,			CMD_FL_GAME,				"sets a player's world instance" );
-	cmdSystem->AddCommand( "addIcon",				Cmd_AddIcon_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"adds a test icon" );
-	cmdSystem->AddCommand( "listInstances",			Cmd_ListInstances_f,		CMD_FL_GAME,				"lists instances" );
-// ddynerman: emote anims
-	cmdSystem->AddCommand( "emote",					Cmd_PlayerEmote_f,			CMD_FL_GAME,				"plays an emote" );
+	// RAVEN BEGIN
+	// abahr
+	cmdSystem->AddCommand("call", Cmd_CallScriptFunc_f, CMD_FL_GAME | CMD_FL_CHEAT, "calls script function and prints out return val");
+	cmdSystem->AddCommand("setPlayerGravity", Cmd_SetPlayerGravity_f, CMD_FL_GAME | CMD_FL_CHEAT, "sets players local gravity");
+	// cdr
+	cmdSystem->AddCommand("ai_debugFilter", Cmd_AI_DebugFilter_f, CMD_FL_GAME, "ai_debugMove and ai_debugTactical only work on the specified entity (if none, does one you're looking at)", idGameLocal::ArgCompletion_AIName);
+	// ddynerman: multiple arena/CW stuff
+	cmdSystem->AddCommand("setInstance", Cmd_SetInstance_f, CMD_FL_GAME, "sets a player's world instance");
+	cmdSystem->AddCommand("addIcon", Cmd_AddIcon_f, CMD_FL_GAME | CMD_FL_CHEAT, "adds a test icon");
+	cmdSystem->AddCommand("listInstances", Cmd_ListInstances_f, CMD_FL_GAME, "lists instances");
+	// ddynerman: emote anims
+	cmdSystem->AddCommand("emote", Cmd_PlayerEmote_f, CMD_FL_GAME, "plays an emote");
 
-	cmdSystem->AddCommand( "checkSave",				Cmd_CheckSave_f,			CMD_FL_GAME,				"tests save system" );
+	cmdSystem->AddCommand("checkSave", Cmd_CheckSave_f, CMD_FL_GAME, "tests save system");
 
-// jshepard: fade music in / out
-	cmdSystem->AddCommand( "fadeSound",				Cmd_FadeSound_f,			CMD_FL_GAME|CMD_FL_CHEAT,	"fades all sound by X decibles over Y seconds" );
+	// jshepard: fade music in / out
+	cmdSystem->AddCommand("fadeSound", Cmd_FadeSound_f, CMD_FL_GAME | CMD_FL_CHEAT, "fades all sound by X decibles over Y seconds");
 
-// mekberg: added.
-	cmdSystem->AddCommand( "setPMCVars",			Cmd_SetPMCVars_f,			CMD_FL_GAME,				"Resets player movement cvars" );
+	// mekberg: added.
+	cmdSystem->AddCommand("setPMCVars", Cmd_SetPMCVars_f, CMD_FL_GAME, "Resets player movement cvars");
 
-	cmdSystem->AddCommand( "testClientModel",		Cmd_TestClientModel_f,		CMD_FL_GAME,				"" );
+	cmdSystem->AddCommand("testClientModel", Cmd_TestClientModel_f, CMD_FL_GAME, "");
 #ifndef _FINAL
-	cmdSystem->AddCommand( "clientOverflowReliable", Cmd_ClientOverflowReliable_f, CMD_FL_GAME,				"" );
+	cmdSystem->AddCommand("clientOverflowReliable", Cmd_ClientOverflowReliable_f, CMD_FL_GAME, "");
 #endif
-// RAVEN END
-// RITUAL START
-// squirrel: Mode-agnostic buymenus
-	cmdSystem->AddCommand( "buyMenu",				Cmd_ToggleBuyMenu_f,		CMD_FL_GAME,				"Toggle buy menu (if in a buy zone and the game type supports it)" );
-	cmdSystem->AddCommand( "buy",					Cmd_BuyItem_f,				CMD_FL_GAME,				"Buy an item (if in a buy zone and the game type supports it)" );
-// RITUAL END
-	cmdSystem->AddCommand("giveFish", Cmd_GiveFish_f, CMD_FL_GAME|CMD_FL_CHEAT, "Give you fish!");
-	cmdSystem->AddCommand("takeFish", Cmd_TakeFish_f, CMD_FL_GAME|CMD_FL_CHEAT, "Give god fish!");
+	// RAVEN END
+	// RITUAL START
+	// squirrel: Mode-agnostic buymenus
+	cmdSystem->AddCommand("buyMenu", Cmd_ToggleBuyMenu_f, CMD_FL_GAME, "Toggle buy menu (if in a buy zone and the game type supports it)");
+	cmdSystem->AddCommand("buy", Cmd_BuyItem_f, CMD_FL_GAME, "Buy an item (if in a buy zone and the game type supports it)");
+	// RITUAL END
+	cmdSystem->AddCommand("giveFish", Cmd_GiveFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "Give you fish!");
+	cmdSystem->AddCommand("takeFish", Cmd_TakeFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "Give god fish!");
+	cmdSystem->AddCommand("displayFish", Cmd_DisplayFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "See your fish.");
 }
 
 /*
