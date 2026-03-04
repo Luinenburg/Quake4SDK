@@ -2137,11 +2137,8 @@ END_CLASS
 slFishingBobber::slFishingBobber( ) {}
 slFishingBobber::~slFishingBobber( ) {}
 
-bool findInList( const char* source, char* comparisons[] ) {
-	int comparisonLength = sizeof(comparisons) / sizeof(comparisons[0]);
-
-	for ( int i = 0; i < comparisonLength; i++ ) {
-		gameLocal.Printf("%s == %s => %d", source, comparisons[i], strcmp(source, comparisons[i]));
+bool findInList( const char* source, char* comparisons[], int length) {
+	for ( int i = 0; i < length; i++ ) {
 		if ( !strcmp( source, comparisons[i] ) ) return true;
 	}
 	return false;
@@ -2170,24 +2167,31 @@ FishType slFishingBobber::FishingSpotFromMaterial(const idMaterial* contactMater
 
 	if (matType) {
 		const char* matName = matType->GetName( );
-		if ( findInList( matName, dirtySpots    ) ) return FishType::DIRTY;
-		if ( findInList( matName, rockySpots    ) ) return FishType::ROCKY;
-		if ( findInList( matName, metallicSpots ) ) return FishType::METALLIC;
-		if ( findInList( matName, fleshySpots   ) ) return FishType::FLESHY;
+		if ( findInList( matName, dirtySpots, 2    ) ) return FishType::DIRTY;
+		if ( findInList( matName, rockySpots, 2    ) ) return FishType::ROCKY;
+		if ( findInList( matName, metallicSpots, 2 ) ) return FishType::METALLIC;
+		if ( findInList( matName, fleshySpots, 2   ) ) return FishType::FLESHY;
 	}
 	return FishType::UGLY;
 }
 
 bool slFishingBobber::Collide(const trace_t& collision, const idVec3& velocity, bool& hitTeleporter) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	const idMaterial* contactMaterial = collision.c.material;
+
+	gameLocal.Printf("FishingSpot: %i\n", FishingSpotFromMaterial(contactMaterial));
 	if (collision.c.material->GetMaterialType()) {
-		gameLocal.Printf("FishingSpot: %i\nMaterialType: %s\n", FishingSpotFromMaterial(collision.c.material), collision.c.material->GetMaterialType()->GetName());
+		gameLocal.Printf("MaterialType: %s\n", contactMaterial->GetMaterialType()->GetName());
 	}
 	else {
-		gameLocal.Printf("FishingSpot: %i\nMaterialType: %s\n", FishingSpotFromMaterial(collision.c.material), collision.c.material->GetMaterialType()->GetName());
-		if (collision.c.material->GetFileName()) gameLocal.Printf("%s\n", collision.c.material->GetFileName());
-		if (collision.c.material->GetName()) gameLocal.Printf("%s\n", collision.c.material->GetName());
+		if (collision.c.material->GetFileName()) gameLocal.Printf("%s\n", contactMaterial->GetFileName());
+		if (collision.c.material->GetName()) gameLocal.Printf("%s\n", contactMaterial->GetName());
 	}
-	return idProjectile::Collide(collision, velocity, hitTeleporter);
+	FishType fishReceived = FishingSpotFromMaterial(contactMaterial);
+	player->giveFish(fishReceived);
+
+	idProjectile::Fizzle();
+	return true;
 }
 
 // Sophia End
