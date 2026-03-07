@@ -3022,7 +3022,9 @@ void Cmd_ShuffleTeams_f( const idCmdArgs& args ) {
 	gameLocal.mpGame.ShuffleTeams();
 }
 
-// Fish
+// ------
+//  FISH
+// ------
 
 FishType idStrToFish(idStr input) {
 	if (input.Cmp("ugly")==0) return FishType::UGLY;
@@ -3050,11 +3052,11 @@ void Cmd_GiveFish_f(const idCmdArgs& args) {
 	idStr strFish = args.Argv(1);
 	FishType fish = idStrToFish(strFish);
 	if (fish == FishType::n_SIZE) {
-		gameLocal.Printf("Invalid fish! {ugly, dirty, metallic, rocky, fleshy}");
+		gameLocal.Printf("Invalid fish! {ugly, dirty, metallic, rocky, fleshy}\n");
 		return;
 	}
 	idStr amount = args.Argv(2);
-	player->giveFish(fish, atoi(amount)) ? gameLocal.Printf("Request granted") : gameLocal.Printf("Request not granted");
+	player->giveFish(fish, atoi(amount)) ? gameLocal.Printf("Request granted\n") : gameLocal.Printf("Request not granted\n");
 }
 
 void Cmd_TakeFish_f(const idCmdArgs& args) {
@@ -3063,17 +3065,38 @@ void Cmd_TakeFish_f(const idCmdArgs& args) {
 	idStr strFish = args.Argv(1);
 	FishType fish = idStrToFish(strFish);
 	if (fish == FishType::n_SIZE) {
-		gameLocal.Printf("Invalid fish! {ugly, dirty, metallic, rocky, fleshy}");
+		gameLocal.Printf("Invalid fish! {ugly, dirty, metallic, rocky, fleshy}\n");
 	}
 	idStr amount = args.Argv(2);
-	player->takeFish(fish, atoi(amount)) ? gameLocal.Printf("Request granted") : gameLocal.Printf("Request not granted");
+	player->takeFish(fish, atoi(amount)) ? gameLocal.Printf("Request granted\n") : gameLocal.Printf("Request not granted\n");
 }
 
 void Cmd_DisplayFish_f(const idCmdArgs& args) {
 	idPlayer* player;
 	player = gameLocal.GetLocalPlayer();
 	for (int i = 0; i < FishType::n_SIZE; i++)
-		gameLocal.Printf("%s: %d", fishToString(static_cast<FishType>(i)), player->grabFish(static_cast<FishType>(i)));
+		gameLocal.Printf("%s: %d\n", fishToString(static_cast<FishType>(i)), player->grabFish(static_cast<FishType>(i)));
+	gameLocal.Printf("Cash: %f\n", player->GetCash());
+}
+
+// -------
+//  MONEY
+// -------
+
+void Cmd_SellFish_f(const idCmdArgs& args) {
+	idPlayer* player;
+	player = gameLocal.GetLocalPlayer();
+	FishType fish = idStrToFish(args.Argv(1));
+	if (fish == FishType::n_SIZE) {
+		gameLocal.Printf("Invalid fish!\n");
+		return;
+	}
+	int amountToSell = atoi(args.Argv(2));
+	if (!player->takeFish(fish, amountToSell)) {
+		gameLocal.Printf("Too many fish! Sorry.\n");
+		return;
+	}
+	player->GiveCash(amountToSell * (static_cast<int>(fish) + 1));
 }
 
 #ifndef _FINAL
@@ -3289,6 +3312,7 @@ void idGameLocal::InitConsoleCommands(void) {
 	cmdSystem->AddCommand("giveFish", Cmd_GiveFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "Give you fish!");
 	cmdSystem->AddCommand("takeFish", Cmd_TakeFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "Give god fish!");
 	cmdSystem->AddCommand("displayFish", Cmd_DisplayFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "See your fish.");
+	cmdSystem->AddCommand("sellFish", Cmd_SellFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "Sell yo fish");
 }
 
 /*

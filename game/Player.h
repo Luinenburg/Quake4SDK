@@ -268,6 +268,19 @@ public:
 	int						secretAreasDiscovered;
 };
 
+class slQuests {
+public:
+	slQuests();
+	~slQuests();
+	idStr getName();
+	float getReward();
+private:
+	idStr name;
+	idStr description;
+	FishType requirement;
+	float reward;
+};
+
 class idPlayer : public idActor {
 public:
 
@@ -792,10 +805,11 @@ public:
 	itemBuyStatus_t			ItemBuyStatus( const char* itemName );
 	bool					CanBuyItem( const char* itemName );
 	void					GiveCash( float cashDeltaAmount );
-	void					ClampCash( float minCash, float maxCash );
+	void					ClampCash();
 	void					SetCash( float newCashAmount );
 	void					ResetCash();
 // RITUAL END
+	float					GetCash();
 
 	// Fish
 	bool					giveFish(FishType fish, int amount = 1);

@@ -1428,7 +1428,8 @@ void idClass::RegisterClasses( void )
 	REGISTER(WeaponNapalmGun);	// ..\..\code\game\weapon\WeaponNapalmGun.cpp
 // RITUAL END
 // Sophia Begin
-	REGISTER(slFishingBobber);
+	REGISTER(slFishingBobber); // ..\code\game\projectile.cpp
+	REGISTER(slQuests); // ..\..\code\game\player.cpp
 // Sophia End
 #undef REGISTER
 }

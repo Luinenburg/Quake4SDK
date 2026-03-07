@@ -14007,64 +14007,31 @@ bool idPlayer::AllowedVoiceDest( int from ) {
 }
 
 // RITUAL BEGIN
-void idPlayer::ClampCash( float minCash, float maxCash )
+void idPlayer::ClampCash()
 {
-	if( buyMenuCash < minCash )
-		buyMenuCash = minCash;
-
-	if( buyMenuCash > maxCash )
-		buyMenuCash = maxCash;
+	if( buyMenuCash < 0 )
+		buyMenuCash = 0;
 }
 
 void idPlayer::GiveCash( float cashDeltaAmount )
 {
-	//int minCash = gameLocal.mpGame.mpBuyingManager.GetIntValueForKey( "playerMinCash", 0 );
-	//int maxCash = gameLocal.mpGame.mpBuyingManager.GetIntValueForKey( "playerMaxCash", 0 );
-	float minCash = (float) gameLocal.serverInfo.GetInt("si_buyModeMinCredits");
-	float maxCash = (float) gameLocal.serverInfo.GetInt("si_buyModeMaxCredits");
-
-	float oldCash = buyMenuCash;
+	if (buyMenuCash + cashDeltaAmount < 0) return;
 	buyMenuCash += cashDeltaAmount;
-	ClampCash( minCash, maxCash );
-
-	if( (int)buyMenuCash != (int)oldCash )
-	{
-		gameLocal.mpGame.RedrawLocalBuyMenu();
-	}
-
-	if( (int)buyMenuCash > (int)oldCash )
-	{
-		// Play the "get cash" sound
-//		gameLocal.GetLocalPlayer()->StartSound( "snd_buying_givecash", SND_CHANNEL_ANY, 0, false, NULL );
-	}
-	else if( (int)buyMenuCash < (int)oldCash )
-	{
-		// Play the "lose cash" sound
-//		gameLocal.GetLocalPlayer()->StartSound( "snd_buying_givecash", SND_CHANNEL_ANY, 0, false, NULL );
-	}
+	ClampCash();
 }
 
 void idPlayer::SetCash( float newCashAmount )
 {
-	//int minCash = gameLocal.mpGame.mpBuyingManager.GetIntValueForKey( "playerMinCash", 0 );
-	//int maxCash = gameLocal.mpGame.mpBuyingManager.GetIntValueForKey( "playerMaxCash", 0 );
-	float minCash = (float) gameLocal.serverInfo.GetInt("si_buyModeMinCredits");
-	float maxCash = (float) gameLocal.serverInfo.GetInt("si_buyModeMaxCredits");
-
 	buyMenuCash = newCashAmount;
-	ClampCash( minCash, maxCash );
 }
 
 void idPlayer::ResetCash()
 {
-	//int minCash = gameLocal.mpGame.mpBuyingManager.GetIntValueForKey( "playerMinCash", 0 );
-	//int maxCash = gameLocal.mpGame.mpBuyingManager.GetIntValueForKey( "playerMaxCash", 0 );
-	//buyMenuCash = gameLocal.mpGame.mpBuyingManager.GetIntValueForKey( "playerStartingCash", 0 );
+	buyMenuCash = 0;
+}
 
-	float minCash = (float) gameLocal.serverInfo.GetInt("si_buyModeMinCredits");
-	float maxCash = (float) gameLocal.serverInfo.GetInt("si_buyModeMaxCredits");
-	buyMenuCash = (float) gameLocal.serverInfo.GetInt("si_buyModeStartingCredits");
-	ClampCash( minCash, maxCash );
+float idPlayer::GetCash() {
+	return buyMenuCash;
 }
 
 bool idPlayer::giveFish(FishType fish, int amount)
@@ -14112,3 +14079,21 @@ int idPlayer::CanSelectWeapon(const char* weaponName)
 }
 
 // RITUAL END
+
+slQuests::slQuests()
+{
+}
+
+slQuests::~slQuests()
+{
+}
+
+idStr slQuests::getName()
+{
+	return idStr();
+}
+
+float slQuests::getReward()
+{
+	return 0.0f;
+}
