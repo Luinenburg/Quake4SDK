@@ -3099,6 +3099,59 @@ void Cmd_SellFish_f(const idCmdArgs& args) {
 	player->GiveCash(amountToSell * (static_cast<int>(fish) + 1));
 }
 
+slQuestDifficulty strToQD(idStr input) {
+	if (input.Cmp("easy") == 0) return slQuestDifficulty::EASY;
+	if (input.Cmp("medium") == 0) return slQuestDifficulty::MEDIUM;
+	if (input.Cmp("hard") == 0) return slQuestDifficulty::HARD;
+	return slQuestDifficulty::QUEST_SIZE;
+}
+
+void Cmd_GiveQuest_f(const idCmdArgs& args) {
+	idPlayer* player;
+	player = gameLocal.GetLocalPlayer();
+	slQuestDifficulty difficulty = strToQD(args.Argv(1));
+	if (difficulty == slQuestDifficulty::QUEST_SIZE) {
+		gameLocal.Printf("Invalid difficulty option. [easy, normal, hard]\n");
+		return;
+	}
+	if (!player->FindQuest(difficulty))
+	{
+		gameLocal.Printf("Player already has a quest.\n");
+	}
+	else
+	{
+		gameLocal.Printf("Player has been granted a quest.\n");
+	}
+}
+
+void Cmd_SubmitQuest_f(const idCmdArgs& args) {
+	idPlayer* player;
+	player = gameLocal.GetLocalPlayer();
+	if (!player->SubmitQuest()) {
+		gameLocal.Printf("There was an issue submitting the quest.\n");
+	}
+	else {
+		gameLocal.Printf("Quest submitted.\n");
+	}
+}
+
+void Cmd_DisplayQuest_f(const idCmdArgs& args) {
+	idPlayer* player;
+	player = gameLocal.GetLocalPlayer();
+	if (player->getQuest().getDifficulty() == slQuestDifficulty::QUEST_SIZE) {
+		gameLocal.Printf("Player does not currently have a quest.\n");
+	}
+	else {
+		gameLocal.Printf("Name: %s\nDescription: %s\nFish: %s\nRequired Amount: %d\n Reward: %f",
+			player->getQuest().getName(),
+			player->getQuest().getDescription(),
+			player->getQuest().getRequirement(),
+			player->getQuest().getRequiredAmount(),
+			player->getQuest().getReward()
+		);
+	}
+}
+
 #ifndef _FINAL
 void Cmd_ClientOverflowReliable_f( const idCmdArgs& args ) {
 	idBitMsg	outMsg;
@@ -3309,10 +3362,17 @@ void idGameLocal::InitConsoleCommands(void) {
 	cmdSystem->AddCommand("buyMenu", Cmd_ToggleBuyMenu_f, CMD_FL_GAME, "Toggle buy menu (if in a buy zone and the game type supports it)");
 	cmdSystem->AddCommand("buy", Cmd_BuyItem_f, CMD_FL_GAME, "Buy an item (if in a buy zone and the game type supports it)");
 	// RITUAL END
+
+	// Fish
 	cmdSystem->AddCommand("giveFish", Cmd_GiveFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "Give you fish!");
 	cmdSystem->AddCommand("takeFish", Cmd_TakeFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "Give god fish!");
 	cmdSystem->AddCommand("displayFish", Cmd_DisplayFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "See your fish.");
 	cmdSystem->AddCommand("sellFish", Cmd_SellFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "Sell yo fish");
+
+	// Quests
+	cmdSystem->AddCommand("FindQuest", Cmd_GiveQuest_f, CMD_FL_GAME | CMD_FL_CHEAT, "Get a quest");
+	cmdSystem->AddCommand("SubmitQuest", Cmd_SubmitQuest_f, CMD_FL_GAME | CMD_FL_CHEAT, "Submit your quest");
+	cmdSystem->AddCommand("ShowQuest", Cmd_DisplayQuest_f, CMD_FL_GAME | CMD_FL_CHEAT, "View current quest");
 }
 
 /*

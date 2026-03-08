@@ -14063,6 +14063,7 @@ bool idPlayer::SubmitQuest()
 	if (currentQuest.getDifficulty() == slQuestDifficulty::QUEST_SIZE) return false;
 	if (takeFish(currentQuest.getRequirement(), currentQuest.getRequiredAmount())) {
 		GiveCash(currentQuest.getReward());
+		currentQuest = slQuests();
 	}
 	else
 	{
