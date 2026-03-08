@@ -1429,7 +1429,6 @@ void idClass::RegisterClasses( void )
 // RITUAL END
 // Sophia Begin
 	REGISTER(slFishingBobber); // ..\code\game\projectile.cpp
-	REGISTER(slQuests); // ..\..\code\game\player.cpp
 // Sophia End
 #undef REGISTER
 }

@@ -275,7 +275,7 @@ enum slQuestDifficulty {
 	QUEST_SIZE
 };
 
-class slQuests : public idClass {
+class slQuests {
 public:
 	slQuests(const char* name, const char* description, FishType requirement, int requiredAmount, slQuestDifficulty difficulty);
 	slQuests();
@@ -295,38 +295,7 @@ private:
 	slQuestDifficulty difficulty;
 };
 
-slQuests generateQuest(slQuestDifficulty difficulty) {
-	idRandom random = idRandom(gameLocal.GetTime());
-
-	switch (difficulty) {
-	case slQuestDifficulty::EASY:
-		return slQuests(
-			"EQ",
-			"Easy Quest",
-			static_cast<FishType>(random.RandomInt(1)),
-			random.RandomInt(8) + 2,
-			slQuestDifficulty::EASY
-		);
-	case slQuestDifficulty::MEDIUM:
-		return slQuests(
-			"MQ",
-			"Medium Quest",
-			static_cast<FishType>(random.RandomInt(2)+1),
-			random.RandomInt(8) + 4,
-			slQuestDifficulty::EASY
-		);
-	case slQuestDifficulty::HARD:
-		return slQuests(
-			"HQ",
-			"Hard Quest",
-			static_cast<FishType>(random.RandomInt(2)+2),
-			random.RandomInt(8) + 6,
-			slQuestDifficulty::EASY
-		);
-	default:
-		return slQuests();
-	}
-}
+slQuests generateQuest(slQuestDifficulty difficulty);
 
 class idPlayer : public idActor {
 public:
