@@ -1427,6 +1427,9 @@ void idClass::RegisterClasses( void )
 	REGISTER(riDeadZonePowerup); // ..\..\code\game\Item.cpp
 	REGISTER(WeaponNapalmGun);	// ..\..\code\game\weapon\WeaponNapalmGun.cpp
 // RITUAL END
+// Sophia Begin
+	REGISTER(slFishingBobber); // ..\code\game\projectile.cpp
+// Sophia End
 #undef REGISTER
 }
 

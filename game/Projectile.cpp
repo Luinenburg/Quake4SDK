@@ -2122,3 +2122,76 @@ void rvMIRVProjectile::Event_LaunchWarheads( void ) {
 
 }
 // RAVEN END
+
+// Sophia Start
+
+/*
+=============================
+slStickyExplosive
+=============================
+*/
+
+CLASS_DECLARATION( idProjectile, slFishingBobber )
+END_CLASS
+
+slFishingBobber::slFishingBobber( ) {}
+slFishingBobber::~slFishingBobber( ) {}
+
+bool findInList( const char* source, char* comparisons[], int length) {
+	for ( int i = 0; i < length; i++ ) {
+		if ( !strcmp( source, comparisons[i] ) ) return true;
+	}
+	return false;
+}
+
+FishType slFishingBobber::FishingSpotFromMaterial(const idMaterial* contactMaterial) {
+	const rvDeclMatType*    matType = contactMaterial->GetMaterialType( );
+	const char*             matName = contactMaterial->GetFileName( );
+
+	char* dirtySpots[] = {
+		"dirty",
+		"concrete"
+	};
+	char* rockySpots[] = {
+		"rock",
+		"armor"
+	};
+	char* metallicSpots[] = {
+		"electronics",
+		"solidmetal"
+	};
+	char* fleshySpots[] = {
+		"flesh",
+		"monstermetal"
+	};
+
+	if (matType) {
+		const char* matName = matType->GetName( );
+		if ( findInList( matName, dirtySpots, 2    ) ) return FishType::DIRTY;
+		if ( findInList( matName, rockySpots, 2    ) ) return FishType::ROCKY;
+		if ( findInList( matName, metallicSpots, 2 ) ) return FishType::METALLIC;
+		if ( findInList( matName, fleshySpots, 2   ) ) return FishType::FLESHY;
+	}
+	return FishType::UGLY;
+}
+
+bool slFishingBobber::Collide(const trace_t& collision, const idVec3& velocity, bool& hitTeleporter) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	const idMaterial* contactMaterial = collision.c.material;
+
+	gameLocal.Printf("FishingSpot: %i\n", FishingSpotFromMaterial(contactMaterial));
+	if (collision.c.material->GetMaterialType()) {
+		gameLocal.Printf("MaterialType: %s\n", contactMaterial->GetMaterialType()->GetName());
+	}
+	else {
+		if (collision.c.material->GetFileName()) gameLocal.Printf("%s\n", contactMaterial->GetFileName());
+		if (collision.c.material->GetName()) gameLocal.Printf("%s\n", contactMaterial->GetName());
+	}
+	FishType fishReceived = FishingSpotFromMaterial(contactMaterial);
+	player->giveFish(fishReceived);
+
+	idProjectile::Fizzle();
+	return true;
+}
+
+// Sophia End

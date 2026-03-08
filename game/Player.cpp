@@ -2013,6 +2013,16 @@ void idPlayer::Spawn( void ) {
 	declManager->FindType( DECL_ENTITYDEF, "damage_telefrag", false, false );
 	declManager->FindType( DECL_ENTITYDEF, "dmg_shellshock", false, false );
 	declManager->FindType( DECL_ENTITYDEF, "dmg_shellshock_nohl", false, false );
+	
+	// Fish
+	Fish[FishType::UGLY] =		spawnArgs.GetInt("fish_ugly", "0");
+	Fish[FishType::DIRTY] =		spawnArgs.GetInt("fish_dirty", "0");
+	Fish[FishType::ROCKY] =		spawnArgs.GetInt("fish_rocky", "0");
+	Fish[FishType::METALLIC] =	spawnArgs.GetInt("fish_metallic", "0");
+	Fish[FishType::FLESHY] =	spawnArgs.GetInt("fish_fleshy", "0");
+
+	// Quests
+	currentQuest = slQuests();
 
 	gibSkin = declManager->FindSkin( spawnArgs.GetString( "skin_gibskin" ) );
 
@@ -2330,6 +2340,10 @@ void idPlayer::Save( idSaveGame *savefile ) const {
 	// TOSAVE: const idDeclEntityDef*	cachedWeaponDefs [ MAX_WEAPONS ];	// cnicholson: Save these?
 	// TOSAVE: const idDeclEntityDef*	cachedPowerupDefs [ POWERUP_MAX ];
 
+	// Fish Stuff
+	for (int i = 0; i < FishType::FISH_SIZE; i++)
+		savefile->WriteInt( Fish[i] );
+
 #ifndef _XENON
  	if ( hud ) {
 		hud->SetStateString( "message", common->GetLocalizedString( "#str_102916" ) );
@@ -2602,6 +2616,10 @@ void idPlayer::Restore( idRestoreGame *savefile ) {
 	savefile->ReadBool( objectivesEnabled );
 
 	savefile->ReadBool( flagCanFire );
+
+	// Fish Stuff
+	for (int i = 0; i < FishType::FISH_SIZE; i++)
+		savefile->ReadInt(Fish[i]);
 
 	// set the pm_ cvars
 	const idKeyValue	*kv;
@@ -13993,64 +14011,76 @@ bool idPlayer::AllowedVoiceDest( int from ) {
 }
 
 // RITUAL BEGIN
-void idPlayer::ClampCash( float minCash, float maxCash )
+void idPlayer::ClampCash()
 {
-	if( buyMenuCash < minCash )
-		buyMenuCash = minCash;
-
-	if( buyMenuCash > maxCash )
-		buyMenuCash = maxCash;
+	if( buyMenuCash < 0 )
+		buyMenuCash = 0;
 }
 
 void idPlayer::GiveCash( float cashDeltaAmount )
 {
-	//int minCash = gameLocal.mpGame.mpBuyingManager.GetIntValueForKey( "playerMinCash", 0 );
-	//int maxCash = gameLocal.mpGame.mpBuyingManager.GetIntValueForKey( "playerMaxCash", 0 );
-	float minCash = (float) gameLocal.serverInfo.GetInt("si_buyModeMinCredits");
-	float maxCash = (float) gameLocal.serverInfo.GetInt("si_buyModeMaxCredits");
-
-	float oldCash = buyMenuCash;
+	if (buyMenuCash + cashDeltaAmount < 0) return;
 	buyMenuCash += cashDeltaAmount;
-	ClampCash( minCash, maxCash );
-
-	if( (int)buyMenuCash != (int)oldCash )
-	{
-		gameLocal.mpGame.RedrawLocalBuyMenu();
-	}
-
-	if( (int)buyMenuCash > (int)oldCash )
-	{
-		// Play the "get cash" sound
-//		gameLocal.GetLocalPlayer()->StartSound( "snd_buying_givecash", SND_CHANNEL_ANY, 0, false, NULL );
-	}
-	else if( (int)buyMenuCash < (int)oldCash )
-	{
-		// Play the "lose cash" sound
-//		gameLocal.GetLocalPlayer()->StartSound( "snd_buying_givecash", SND_CHANNEL_ANY, 0, false, NULL );
-	}
+	ClampCash();
 }
 
 void idPlayer::SetCash( float newCashAmount )
 {
-	//int minCash = gameLocal.mpGame.mpBuyingManager.GetIntValueForKey( "playerMinCash", 0 );
-	//int maxCash = gameLocal.mpGame.mpBuyingManager.GetIntValueForKey( "playerMaxCash", 0 );
-	float minCash = (float) gameLocal.serverInfo.GetInt("si_buyModeMinCredits");
-	float maxCash = (float) gameLocal.serverInfo.GetInt("si_buyModeMaxCredits");
-
 	buyMenuCash = newCashAmount;
-	ClampCash( minCash, maxCash );
 }
 
 void idPlayer::ResetCash()
 {
-	//int minCash = gameLocal.mpGame.mpBuyingManager.GetIntValueForKey( "playerMinCash", 0 );
-	//int maxCash = gameLocal.mpGame.mpBuyingManager.GetIntValueForKey( "playerMaxCash", 0 );
-	//buyMenuCash = gameLocal.mpGame.mpBuyingManager.GetIntValueForKey( "playerStartingCash", 0 );
+	buyMenuCash = 0;
+}
 
-	float minCash = (float) gameLocal.serverInfo.GetInt("si_buyModeMinCredits");
-	float maxCash = (float) gameLocal.serverInfo.GetInt("si_buyModeMaxCredits");
-	buyMenuCash = (float) gameLocal.serverInfo.GetInt("si_buyModeStartingCredits");
-	ClampCash( minCash, maxCash );
+float idPlayer::GetCash() {
+	return buyMenuCash;
+}
+
+bool idPlayer::giveFish(FishType fish, int amount)
+{
+	if (amount < 0) return false;
+	Fish[fish] += amount;
+	return true;
+}
+
+bool idPlayer::takeFish(FishType fish, int amount)
+{
+	if (Fish[fish] < amount || amount < 0) return false;
+	Fish[fish] -= amount;
+	return true;
+}
+
+int idPlayer::grabFish(FishType fish)
+{
+	if (fish == FishType::FISH_SIZE) return -1;
+	return Fish[fish];
+}
+
+bool idPlayer::SubmitQuest()
+{
+	if (currentQuest.getDifficulty() == slQuestDifficulty::QUEST_SIZE) return false;
+	if (takeFish(currentQuest.getRequirement(), currentQuest.getRequiredAmount())) {
+		GiveCash(currentQuest.getReward());
+		currentQuest = slQuests();
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool idPlayer::FindQuest(slQuestDifficulty difficulty)
+{
+	if (currentQuest.getDifficulty() != slQuestDifficulty::QUEST_SIZE) return false;
+	currentQuest = generateQuest(difficulty);
+	return true;
+}
+
+slQuests idPlayer::getQuest()
+{
+	return currentQuest;
 }
 
 /**
@@ -14078,3 +14108,90 @@ int idPlayer::CanSelectWeapon(const char* weaponName)
 }
 
 // RITUAL END
+
+slQuests generateQuest(slQuestDifficulty difficulty) {
+	idRandom random = idRandom(gameLocal.GetTime());
+
+	switch (difficulty) {
+	case slQuestDifficulty::EASY:
+		return slQuests(
+			"EQ",
+			"Easy Quest",
+			static_cast<FishType>(random.RandomInt(1)),
+			random.RandomInt(8) + 2,
+			slQuestDifficulty::EASY
+		);
+	case slQuestDifficulty::MEDIUM:
+		return slQuests(
+			"MQ",
+			"Medium Quest",
+			static_cast<FishType>(random.RandomInt(2) + 1),
+			random.RandomInt(8) + 4,
+			slQuestDifficulty::EASY
+		);
+	case slQuestDifficulty::HARD:
+		return slQuests(
+			"HQ",
+			"Hard Quest",
+			static_cast<FishType>(random.RandomInt(2) + 2),
+			random.RandomInt(8) + 6,
+			slQuestDifficulty::EASY
+		);
+	default:
+		return slQuests();
+	}
+}
+
+slQuests::slQuests(char* name, char* description, FishType requirement, int requiredAmount, slQuestDifficulty difficulty)
+{
+	this->name = name;
+	this->description = description;
+	this->requirement = requirement;
+	this->requiredAmount = requiredAmount;
+	this->difficulty = difficulty;
+	this->reward = (static_cast<float>(requirement) + 1.0) * static_cast<float>(requiredAmount);
+}
+
+slQuests::slQuests()
+{
+	this->name = "";
+	this->description = "";
+	this->requirement = FishType::FISH_SIZE;
+	this->requiredAmount = -1;
+	this->difficulty = slQuestDifficulty::QUEST_SIZE;
+	this->reward = (static_cast<float>(requirement) + 1.0) * static_cast<float>(requiredAmount);
+}
+
+slQuests::~slQuests()
+{
+}
+
+char* slQuests::getName()
+{
+	return name;
+}
+
+char* slQuests::getDescription()
+{
+	return description;
+}
+
+float slQuests::getReward()
+{
+	return reward;
+}
+
+int slQuests::getRequiredAmount()
+{
+	return requiredAmount;
+}
+
+FishType slQuests::getRequirement()
+{
+	return requirement;
+}
+
+slQuestDifficulty slQuests::getDifficulty()
+{
+	return difficulty;
+}

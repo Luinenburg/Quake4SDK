@@ -3,6 +3,7 @@
 //
 // MERGE_DATE 07/07/2004
 
+#include "Projectile.h"
 #ifndef __GAME_PLAYER_H__
 #define __GAME_PLAYER_H__
 
@@ -266,6 +267,35 @@ public:
 	
 	int						secretAreasDiscovered;
 };
+
+enum slQuestDifficulty {
+	EASY,
+	MEDIUM,
+	HARD,
+	QUEST_SIZE
+};
+
+class slQuests {
+public:
+	slQuests(char* name, char* description, FishType requirement, int requiredAmount, slQuestDifficulty difficulty);
+	slQuests();
+	~slQuests();
+	char* getName();
+	char* getDescription();
+	float getReward();
+	int getRequiredAmount();
+	FishType getRequirement();
+	slQuestDifficulty getDifficulty();
+private:
+	char* name;
+	char* description;
+	FishType requirement;
+	int requiredAmount;
+	float reward;
+	slQuestDifficulty difficulty;
+};
+
+slQuests generateQuest(slQuestDifficulty difficulty);
 
 class idPlayer : public idActor {
 public:
@@ -791,15 +821,27 @@ public:
 	itemBuyStatus_t			ItemBuyStatus( const char* itemName );
 	bool					CanBuyItem( const char* itemName );
 	void					GiveCash( float cashDeltaAmount );
-	void					ClampCash( float minCash, float maxCash );
+	void					ClampCash();
 	void					SetCash( float newCashAmount );
 	void					ResetCash();
 // RITUAL END
+	float					GetCash();
+
+	// Fish
+	bool					giveFish(FishType fish, int amount = 1);
+	bool					takeFish(FishType fish, int amount = 1);
+	int 					grabFish(FishType fish);
+
+	// Quests
+	bool					SubmitQuest();
+	bool					FindQuest(slQuestDifficulty difficulty);
+	slQuests				getQuest();
 
 protected:
 	void					SetupHead( const char* modelKeyName = "", idVec3 headOffset = idVec3(0, 0, 0) );
 
 private:
+	slQuests				currentQuest;
 	float					vehicleCameraDist;
 
 	jointHandle_t			hipJoint;
@@ -1004,6 +1046,9 @@ private:
 	int						oldInventoryWeapons;
 
 	const idDeclEntityDef*	itemCosts;
+
+	// FISH
+	int						Fish[FishType::FISH_SIZE];
 
 	bool					WantSmoothing( void ) const;
 	void					PredictionErrorDecay( void );
