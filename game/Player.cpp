@@ -14044,13 +14044,12 @@ float idPlayer::GetCash() {
 
 bool idPlayer::giveFish(FishType fish, int amount)
 {
-	idRandom random = idRandom(gameLocal.time);
 	if (amount < 0) return false;
 	if (HasEnhancementEquipped(MORE_FISH)) amount *= 2;
-	if (HasEnhancementEquipped(MULTI_FISH)) giveFish(static_cast<FishType>(random.RandomInt(FishType::FISH_SIZE - 1)), amount);
+	if (HasEnhancementEquipped(MULTI_FISH)) Fish[static_cast<FishType>(gameLocal.random.RandomInt(FishType::FISH_SIZE-1))] += amount;
 	if (HasEnhancementEquipped(GOD_FISHER)) 
 		for (int i = 0; i < FishType::FISH_SIZE; i++)
-			giveFish(static_cast<FishType>(random.RandomInt(i)), amount);
+			Fish[static_cast<FishType>(i)] += amount;
 	Fish[fish] += amount;
 	return true;
 }
@@ -14190,8 +14189,7 @@ int idPlayer::CanSelectWeapon(const char* weaponName)
 // RITUAL END
 
 slQuests generateQuest(slQuestDifficulty difficulty, bool easyQuests) {
-	idRandom random = idRandom(gameLocal.GetTime());
-	int amount = random.RandomInt(8);
+	int amount = gameLocal.random.RandomInt(8);
 	if (!easyQuests) amount += 2;
 
 	switch (difficulty) {
@@ -14199,7 +14197,7 @@ slQuests generateQuest(slQuestDifficulty difficulty, bool easyQuests) {
 		return slQuests(
 			"EQ",
 			"Easy Quest",
-			static_cast<FishType>(random.RandomInt(1)),
+			static_cast<FishType>(gameLocal.random.RandomInt(1)),
 			amount+2,
 			slQuestDifficulty::EASY
 		);
@@ -14207,7 +14205,7 @@ slQuests generateQuest(slQuestDifficulty difficulty, bool easyQuests) {
 		return slQuests(
 			"MQ",
 			"Medium Quest",
-			static_cast<FishType>(random.RandomInt(2) + 1),
+			static_cast<FishType>(gameLocal.random.RandomInt(2) + 1),
 			amount+4,
 			slQuestDifficulty::EASY
 		);
@@ -14215,7 +14213,7 @@ slQuests generateQuest(slQuestDifficulty difficulty, bool easyQuests) {
 		return slQuests(
 			"HQ",
 			"Hard Quest",
-			static_cast<FishType>(random.RandomInt(2) + 2),
+			static_cast<FishType>(gameLocal.random.RandomInt(2) + 2),
 			amount+6,
 			slQuestDifficulty::EASY
 		);
