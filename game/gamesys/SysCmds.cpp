@@ -3032,7 +3032,7 @@ FishType idStrToFish(idStr input) {
 	if (input.Cmp("metallic")==0) return FishType::UGLY;
 	if (input.Cmp("rocky")==0) return FishType::ROCKY;
 	if (input.Cmp("fleshy")==0) return FishType::FLESHY;
-	return FishType::n_SIZE;
+	return FishType::FISH_SIZE;
 }
 
 char* fishToString(FishType fish) {
@@ -3051,7 +3051,7 @@ void Cmd_GiveFish_f(const idCmdArgs& args) {
 	player = gameLocal.GetLocalPlayer();
 	idStr strFish = args.Argv(1);
 	FishType fish = idStrToFish(strFish);
-	if (fish == FishType::n_SIZE) {
+	if (fish == FishType::FISH_SIZE) {
 		gameLocal.Printf("Invalid fish! {ugly, dirty, metallic, rocky, fleshy}\n");
 		return;
 	}
@@ -3064,7 +3064,7 @@ void Cmd_TakeFish_f(const idCmdArgs& args) {
 	player = gameLocal.GetLocalPlayer();
 	idStr strFish = args.Argv(1);
 	FishType fish = idStrToFish(strFish);
-	if (fish == FishType::n_SIZE) {
+	if (fish == FishType::FISH_SIZE) {
 		gameLocal.Printf("Invalid fish! {ugly, dirty, metallic, rocky, fleshy}\n");
 	}
 	idStr amount = args.Argv(2);
@@ -3074,7 +3074,7 @@ void Cmd_TakeFish_f(const idCmdArgs& args) {
 void Cmd_DisplayFish_f(const idCmdArgs& args) {
 	idPlayer* player;
 	player = gameLocal.GetLocalPlayer();
-	for (int i = 0; i < FishType::n_SIZE; i++)
+	for (int i = 0; i < FishType::FISH_SIZE; i++)
 		gameLocal.Printf("%s: %d\n", fishToString(static_cast<FishType>(i)), player->grabFish(static_cast<FishType>(i)));
 	gameLocal.Printf("Cash: %f\n", player->GetCash());
 }
@@ -3087,7 +3087,7 @@ void Cmd_SellFish_f(const idCmdArgs& args) {
 	idPlayer* player;
 	player = gameLocal.GetLocalPlayer();
 	FishType fish = idStrToFish(args.Argv(1));
-	if (fish == FishType::n_SIZE) {
+	if (fish == FishType::FISH_SIZE) {
 		gameLocal.Printf("Invalid fish!\n");
 		return;
 	}

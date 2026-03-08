@@ -2341,7 +2341,7 @@ void idPlayer::Save( idSaveGame *savefile ) const {
 	// TOSAVE: const idDeclEntityDef*	cachedPowerupDefs [ POWERUP_MAX ];
 
 	// Fish Stuff
-	for (int i = 0; i < FishType::n_SIZE; i++)
+	for (int i = 0; i < FishType::FISH_SIZE; i++)
 		savefile->WriteInt( Fish[i] );
 
 #ifndef _XENON
@@ -2618,7 +2618,7 @@ void idPlayer::Restore( idRestoreGame *savefile ) {
 	savefile->ReadBool( flagCanFire );
 
 	// Fish Stuff
-	for (int i = 0; i < FishType::n_SIZE; i++)
+	for (int i = 0; i < FishType::FISH_SIZE; i++)
 		savefile->ReadInt(Fish[i]);
 
 	// set the pm_ cvars
@@ -14054,13 +14054,13 @@ bool idPlayer::takeFish(FishType fish, int amount)
 
 int idPlayer::grabFish(FishType fish)
 {
-	if (fish == FishType::n_SIZE) return -1;
+	if (fish == FishType::FISH_SIZE) return -1;
 	return Fish[fish];
 }
 
 bool idPlayer::SubmitQuest()
 {
-	if (currentQuest.getDifficulty() == slQuestDifficulty::n_SIZE) return false;
+	if (currentQuest.getDifficulty() == slQuestDifficulty::QUEST_SIZE) return false;
 	if (takeFish(currentQuest.getRequirement(), currentQuest.getRequiredAmount())) {
 		GiveCash(currentQuest.getReward());
 	}
@@ -14072,7 +14072,7 @@ bool idPlayer::SubmitQuest()
 
 bool idPlayer::FindQuest(slQuestDifficulty difficulty)
 {
-	if (currentQuest.getDifficulty() != slQuestDifficulty::n_SIZE) return false;
+	if (currentQuest.getDifficulty() != slQuestDifficulty::QUEST_SIZE) return false;
 	currentQuest = generateQuest(difficulty);
 	return true;
 }
@@ -14122,9 +14122,9 @@ slQuests::slQuests()
 {
 	this->name = "";
 	this->description = "";
-	this->requirement = FishType::n_SIZE;
+	this->requirement = FishType::FISH_SIZE;
 	this->requiredAmount = -1;
-	this->difficulty = slQuestDifficulty::n_SIZE;
+	this->difficulty = slQuestDifficulty::QUEST_SIZE;
 	this->reward = (static_cast<float>(requirement) + 1.0) * static_cast<float>(requiredAmount);
 }
 

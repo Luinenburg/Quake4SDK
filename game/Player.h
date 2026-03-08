@@ -272,7 +272,7 @@ enum slQuestDifficulty {
 	EASY,
 	MEDIUM,
 	HARD,
-	n_SIZE
+	QUEST_SIZE
 };
 
 class slQuests : public idClass {
@@ -1079,7 +1079,7 @@ private:
 	const idDeclEntityDef*	itemCosts;
 
 	// FISH
-	int						Fish[FishType::n_SIZE];
+	int						Fish[FishType::FISH_SIZE];
 
 	bool					WantSmoothing( void ) const;
 	void					PredictionErrorDecay( void );

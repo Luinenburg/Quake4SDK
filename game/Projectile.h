@@ -365,7 +365,7 @@ enum FishType {
 	ROCKY,
 	METALLIC,
 	FLESHY,
-	n_SIZE
+	FISH_SIZE
 };
 
 class slFishingBobber : public idProjectile { 
