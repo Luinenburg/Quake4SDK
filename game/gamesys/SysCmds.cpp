@@ -3136,6 +3136,75 @@ void Cmd_DisplayQuest_f(const idCmdArgs& args) {
 	}
 }
 
+const char* enhancementToStr(slEnhancements enhancement) {
+	switch (enhancement) {
+	case slEnhancements::UNEQUIPPED: return "unequipped";
+	case slEnhancements::EASY_QUESTS: return "easy_quests";
+	case slEnhancements::GOD_FISHER: return "god_fisher";
+	case slEnhancements::MORE_FISH: return "more_fish";
+	case slEnhancements::MULTI_FISH: return "multi_fish";
+	case slEnhancements::MORE_MONEY: return "more_money";
+	}
+	return "error";
+}
+
+slEnhancements strToEnhancement(idStr enhancement) {
+	if (enhancement.Cmp("unequipped") == 0) return slEnhancements::UNEQUIPPED;
+	if (enhancement.Cmp("easy_quests") == 0) return slEnhancements::EASY_QUESTS;
+	if (enhancement.Cmp("god_fisher") == 0) return slEnhancements::GOD_FISHER;
+	if (enhancement.Cmp("more_fish") == 0) return slEnhancements::MORE_FISH;
+	if (enhancement.Cmp("multi_fish") == 0) return slEnhancements::MULTI_FISH;
+	if (enhancement.Cmp("more_money") == 0) return slEnhancements::MORE_MONEY;
+	return slEnhancements::ENHANCEMENT_SIZE;
+}
+
+void Cmd_DisplayEquippedEnhancements_f(const idCmdArgs& args) {
+	idPlayer* player;
+	player = gameLocal.GetLocalPlayer();
+	for (int i = 0; i < 3; i++) {
+		gameLocal.Printf("%d: %s\n", i, enhancementToStr(player->GetEquippedEnhancement(i)));
+	}
+}
+
+void Cmd_DisplayOwnedEnhancements_f(const idCmdArgs& args) {
+	idPlayer* player;
+	player = gameLocal.GetLocalPlayer();
+	for (int i = 0; i < player->GetOwnedEnhancements().Num(); i++) {
+		gameLocal.Printf("%d: %s\n", i, enhancementToStr(player->GetOwnedEnhancements()[i]));
+	}
+}
+
+void Cmd_GiveEnhancement_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player->GrantEnhancement(strToEnhancement(args.Argv(1)))) {
+		gameLocal.Printf("Completed.\n");
+	}
+	else {
+		gameLocal.Printf("An error occured.\n");
+	}
+}
+
+void Cmd_EquipEnhancement_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player->EquipEnhancement(strToEnhancement(args.Argv(1)))) {
+		gameLocal.Printf("Completed.\n");
+	}
+	else {
+		gameLocal.Printf("An error occured.\n");
+	}
+}
+
+void Cmd_UnequipEnhancement_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	int slot = atoi(args.Argv(1));
+	if (player->UnequipEnhancement(slot)) {
+		gameLocal.Printf("Completed.\n");
+	}
+	else {
+		gameLocal.Printf("An error occured.\n");
+	}
+}
+
 #ifndef _FINAL
 void Cmd_ClientOverflowReliable_f( const idCmdArgs& args ) {
 	idBitMsg	outMsg;
@@ -3356,6 +3425,14 @@ void idGameLocal::InitConsoleCommands(void) {
 	cmdSystem->AddCommand("FindQuest", Cmd_GiveQuest_f, CMD_FL_GAME | CMD_FL_CHEAT, "Get a quest");
 	cmdSystem->AddCommand("SubmitQuest", Cmd_SubmitQuest_f, CMD_FL_GAME | CMD_FL_CHEAT, "Submit your quest");
 	cmdSystem->AddCommand("ShowQuest", Cmd_DisplayQuest_f, CMD_FL_GAME | CMD_FL_CHEAT, "View current quest");
+
+	// Enhancements
+	cmdSystem->AddCommand("ShowOwnedEnhancements", Cmd_DisplayOwnedEnhancements_f, CMD_FL_GAME | CMD_FL_CHEAT, "View owned enhancements");
+	cmdSystem->AddCommand("ShowEquippedEnhancements", Cmd_DisplayEquippedEnhancements_f, CMD_FL_GAME | CMD_FL_CHEAT, "View equipped enhancements");
+	cmdSystem->AddCommand("grantEnhancement", Cmd_GiveEnhancement_f, CMD_FL_GAME | CMD_FL_CHEAT, "Give player an enhancement");
+	cmdSystem->AddCommand("equipEnhancement", Cmd_EquipEnhancement_f, CMD_FL_GAME | CMD_FL_CHEAT, "Equip an enhancement");
+	cmdSystem->AddCommand("unequipEnhancement", Cmd_UnequipEnhancement_f, CMD_FL_GAME | CMD_FL_CHEAT, "Unequip an enhancement");
+
 }
 
 /*

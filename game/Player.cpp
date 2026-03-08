@@ -14113,6 +14113,7 @@ bool idPlayer::HasEnhancementEquipped(slEnhancements enhancement)
 
 bool idPlayer::GrantEnhancement(slEnhancements enhancement)
 {
+	if (enhancement == slEnhancements::ENHANCEMENT_SIZE) return false;
 	if (HasEnhancementOwned(enhancement)) return false;
 	ownedEnhancements.Insert(enhancement);
 	return true;
