@@ -3126,7 +3126,7 @@ void Cmd_DisplayQuest_f(const idCmdArgs& args) {
 		gameLocal.Printf("Player does not currently have a quest.\n");
 	}
 	else {
-		gameLocal.Printf("Name: %s\nDescription: %s\nFish: %s\nRequired Amount: %d\n Reward: %f",
+		gameLocal.Printf("Name: %s\nDescription: %s\nFish: %s\nRequired Amount: %d\n Reward: %f\n",
 			player->getQuest().getName(),
 			player->getQuest().getDescription(),
 			fishToString(player->getQuest().getRequirement()),
