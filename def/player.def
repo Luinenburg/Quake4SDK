@@ -813,6 +813,11 @@ entityDef player_marine
 	"fish_rocky"						"0"
 	"fish_metallic"						"0"
 	"fish_fleshy"						"0"
+
+	// Enhancements
+	"enhancement_1"						"0"
+	"enhancement_2"						"0"
+	"enhancement_3"						"0"
 }
 
 entityDef player_strogg

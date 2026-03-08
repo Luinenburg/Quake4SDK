@@ -2021,6 +2021,10 @@ void idPlayer::Spawn( void ) {
 	Fish[FishType::METALLIC] =	spawnArgs.GetInt("fish_metallic", "0");
 	Fish[FishType::FLESHY] =	spawnArgs.GetInt("fish_fleshy", "0");
 
+	equippedEnhancements[0] = static_cast<slEnhancements>(spawnArgs.GetInt("enhancement_1", "0"));
+	equippedEnhancements[1] = static_cast<slEnhancements>(spawnArgs.GetInt("enhancement_2", "0"));
+	equippedEnhancements[2] = static_cast<slEnhancements>(spawnArgs.GetInt("enhancement_3", "0"));
+
 	// Quests
 	currentQuest = slQuests();
 
