@@ -14040,7 +14040,13 @@ float idPlayer::GetCash() {
 
 bool idPlayer::giveFish(FishType fish, int amount)
 {
+	idRandom random = idRandom(gameLocal.time);
 	if (amount < 0) return false;
+	if (HasEnhancementEquipped(MORE_FISH)) amount *= 2;
+	if (HasEnhancementEquipped(MULTI_FISH)) giveFish(static_cast<FishType>(random.RandomInt(FishType::FISH_SIZE - 1)), amount);
+	if (HasEnhancementEquipped(GOD_FISHER)) 
+		for (int i = 0; i < FishType::FISH_SIZE; i++)
+			giveFish(static_cast<FishType>(random.RandomInt(i)), amount);
 	Fish[fish] += amount;
 	return true;
 }
@@ -14062,6 +14068,8 @@ bool idPlayer::SubmitQuest()
 {
 	if (currentQuest.getDifficulty() == slQuestDifficulty::QUEST_SIZE) return false;
 	if (takeFish(currentQuest.getRequirement(), currentQuest.getRequiredAmount())) {
+		if (HasEnhancementEquipped(slEnhancements::MORE_MONEY))
+			GiveCash(currentQuest.getReward());
 		GiveCash(currentQuest.getReward());
 		currentQuest = slQuests();
 	}
@@ -14074,13 +14082,80 @@ bool idPlayer::SubmitQuest()
 bool idPlayer::FindQuest(slQuestDifficulty difficulty)
 {
 	if (currentQuest.getDifficulty() != slQuestDifficulty::QUEST_SIZE) return false;
-	currentQuest = generateQuest(difficulty);
+	currentQuest = generateQuest(difficulty, HasEnhancementEquipped(slEnhancements::EASY_QUESTS));
 	return true;
 }
 
 slQuests idPlayer::getQuest()
 {
 	return currentQuest;
+}
+
+bool idPlayer::HasEnhancementOwned(slEnhancements enhancement)
+{
+	for (int i = 0; i < ownedEnhancements.Num(); i++) {
+		if (enhancement == ownedEnhancements[i]) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool idPlayer::HasEnhancementEquipped(slEnhancements enhancement)
+{
+	for (int i = 0; i < 3; i++) {
+		if (enhancement == equippedEnhancements[i]) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool idPlayer::GrantEnhancement(slEnhancements enhancement)
+{
+	if (HasEnhancementOwned(enhancement)) return false;
+	ownedEnhancements.Insert(enhancement);
+	return true;
+}
+
+bool idPlayer::EquipEnhancement(slEnhancements enhancement)
+{
+	if (!HasEnhancementOwned(enhancement)) return false;
+	if (HasEnhancementEquipped(enhancement)) return false;
+	for (int i = 0; i < 3; i++) {
+		if (equippedEnhancements[i] == slEnhancements::UNEQUIPPED) {
+			equippedEnhancements[i] = enhancement;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool idPlayer::SwapEnhancement(slEnhancements enhancement, int slot)
+{
+	if (!HasEnhancementOwned(enhancement)) return false;
+	if (HasEnhancementEquipped(enhancement)) return false;
+	if (slot < 0 || slot > 2) return false;
+	equippedEnhancements[slot] = enhancement;
+	return true;
+}
+
+bool idPlayer::UnequipEnhancement(int slot)
+{
+	if (slot < 0 || slot > 2) return false;
+	equippedEnhancements[slot] = slEnhancements::UNEQUIPPED;
+	return true;
+}
+
+slEnhancements idPlayer::GetEquippedEnhancement(int slot)
+{
+	if (slot < 0 || slot > 2) return slEnhancements::ENHANCEMENT_SIZE;
+	return equippedEnhancements[slot];
+}
+
+idList<slEnhancements> idPlayer::GetOwnedEnhancements()
+{
+	return ownedEnhancements;
 }
 
 /**
@@ -14109,8 +14184,10 @@ int idPlayer::CanSelectWeapon(const char* weaponName)
 
 // RITUAL END
 
-slQuests generateQuest(slQuestDifficulty difficulty) {
+slQuests generateQuest(slQuestDifficulty difficulty, bool easyQuests) {
 	idRandom random = idRandom(gameLocal.GetTime());
+	int amount = random.RandomInt(8);
+	if (!easyQuests) amount += 2;
 
 	switch (difficulty) {
 	case slQuestDifficulty::EASY:
@@ -14118,7 +14195,7 @@ slQuests generateQuest(slQuestDifficulty difficulty) {
 			"EQ",
 			"Easy Quest",
 			static_cast<FishType>(random.RandomInt(1)),
-			random.RandomInt(8) + 2,
+			amount+2,
 			slQuestDifficulty::EASY
 		);
 	case slQuestDifficulty::MEDIUM:
@@ -14126,7 +14203,7 @@ slQuests generateQuest(slQuestDifficulty difficulty) {
 			"MQ",
 			"Medium Quest",
 			static_cast<FishType>(random.RandomInt(2) + 1),
-			random.RandomInt(8) + 4,
+			amount+4,
 			slQuestDifficulty::EASY
 		);
 	case slQuestDifficulty::HARD:
@@ -14134,7 +14211,7 @@ slQuests generateQuest(slQuestDifficulty difficulty) {
 			"HQ",
 			"Hard Quest",
 			static_cast<FishType>(random.RandomInt(2) + 2),
-			random.RandomInt(8) + 6,
+			amount+6,
 			slQuestDifficulty::EASY
 		);
 	default:

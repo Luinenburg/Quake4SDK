@@ -3351,7 +3351,6 @@ void idGameLocal::InitConsoleCommands(void) {
 	cmdSystem->AddCommand("giveFish", Cmd_GiveFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "Give you fish!");
 	cmdSystem->AddCommand("takeFish", Cmd_TakeFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "Give god fish!");
 	cmdSystem->AddCommand("displayFish", Cmd_DisplayFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "See your fish.");
-	cmdSystem->AddCommand("sellFish", Cmd_SellFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "Sell yo fish");
 
 	// Quests
 	cmdSystem->AddCommand("FindQuest", Cmd_GiveQuest_f, CMD_FL_GAME | CMD_FL_CHEAT, "Get a quest");
