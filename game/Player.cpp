@@ -14142,7 +14142,7 @@ slQuests generateQuest(slQuestDifficulty difficulty) {
 	}
 }
 
-slQuests::slQuests(const char* name, const char* description, FishType requirement, int requiredAmount, slQuestDifficulty difficulty)
+slQuests::slQuests(char* name, char* description, FishType requirement, int requiredAmount, slQuestDifficulty difficulty)
 {
 	this->name = name;
 	this->description = description;
@@ -14166,12 +14166,12 @@ slQuests::~slQuests()
 {
 }
 
-idStr slQuests::getName()
+char* slQuests::getName()
 {
 	return name;
 }
 
-idStr slQuests::getDescription()
+char* slQuests::getDescription()
 {
 	return description;
 }

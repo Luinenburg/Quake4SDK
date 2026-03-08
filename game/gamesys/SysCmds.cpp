@@ -3083,22 +3083,6 @@ void Cmd_DisplayFish_f(const idCmdArgs& args) {
 //  MONEY
 // -------
 
-void Cmd_SellFish_f(const idCmdArgs& args) {
-	idPlayer* player;
-	player = gameLocal.GetLocalPlayer();
-	FishType fish = idStrToFish(args.Argv(1));
-	if (fish == FishType::FISH_SIZE) {
-		gameLocal.Printf("Invalid fish!\n");
-		return;
-	}
-	int amountToSell = atoi(args.Argv(2));
-	if (!player->takeFish(fish, amountToSell)) {
-		gameLocal.Printf("Too many fish! Sorry.\n");
-		return;
-	}
-	player->GiveCash(amountToSell * (static_cast<int>(fish) + 1));
-}
-
 slQuestDifficulty strToQD(idStr input) {
 	if (input.Cmp("easy") == 0) return slQuestDifficulty::EASY;
 	if (input.Cmp("medium") == 0) return slQuestDifficulty::MEDIUM;
@@ -3145,7 +3129,7 @@ void Cmd_DisplayQuest_f(const idCmdArgs& args) {
 		gameLocal.Printf("Name: %s\nDescription: %s\nFish: %s\nRequired Amount: %d\n Reward: %f",
 			player->getQuest().getName(),
 			player->getQuest().getDescription(),
-			player->getQuest().getRequirement(),
+			fishToString(player->getQuest().getRequirement()),
 			player->getQuest().getRequiredAmount(),
 			player->getQuest().getReward()
 		);

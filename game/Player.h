@@ -277,18 +277,18 @@ enum slQuestDifficulty {
 
 class slQuests {
 public:
-	slQuests(const char* name, const char* description, FishType requirement, int requiredAmount, slQuestDifficulty difficulty);
+	slQuests(char* name, char* description, FishType requirement, int requiredAmount, slQuestDifficulty difficulty);
 	slQuests();
 	~slQuests();
-	idStr getName();
-	idStr getDescription();
+	char* getName();
+	char* getDescription();
 	float getReward();
 	int getRequiredAmount();
 	FishType getRequirement();
 	slQuestDifficulty getDifficulty();
 private:
-	const char* name;
-	const char* description;
+	char* name;
+	char* description;
 	FishType requirement;
 	int requiredAmount;
 	float reward;
