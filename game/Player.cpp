@@ -2014,11 +2014,15 @@ void idPlayer::Spawn( void ) {
 	declManager->FindType( DECL_ENTITYDEF, "dmg_shellshock", false, false );
 	declManager->FindType( DECL_ENTITYDEF, "dmg_shellshock_nohl", false, false );
 	
+	// Fish
 	Fish[FishType::UGLY] =		spawnArgs.GetInt("fish_ugly", "0");
 	Fish[FishType::DIRTY] =		spawnArgs.GetInt("fish_dirty", "0");
 	Fish[FishType::ROCKY] =		spawnArgs.GetInt("fish_rocky", "0");
 	Fish[FishType::METALLIC] =	spawnArgs.GetInt("fish_metallic", "0");
 	Fish[FishType::FLESHY] =	spawnArgs.GetInt("fish_fleshy", "0");
+
+	// Quests
+	currentQuest = slQuests();
 
 	gibSkin = declManager->FindSkin( spawnArgs.GetString( "skin_gibskin" ) );
 
@@ -14054,6 +14058,30 @@ int idPlayer::grabFish(FishType fish)
 	return Fish[fish];
 }
 
+bool idPlayer::SubmitQuest()
+{
+	if (currentQuest.getDifficulty() == slQuestDifficulty::n_SIZE) return false;
+	if (takeFish(currentQuest.getRequirement(), currentQuest.getRequiredAmount())) {
+		GiveCash(currentQuest.getReward());
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool idPlayer::FindQuest(slQuestDifficulty difficulty)
+{
+	if (currentQuest.getDifficulty() != slQuestDifficulty::n_SIZE) return false;
+	currentQuest = generateQuest(difficulty);
+	return true;
+}
+
+slQuests idPlayer::getQuest()
+{
+	return currentQuest;
+}
+
 /**
  * Checks to see if the player can accept this item in their inventory
  *
@@ -14080,8 +14108,24 @@ int idPlayer::CanSelectWeapon(const char* weaponName)
 
 // RITUAL END
 
+slQuests::slQuests(const char* name, const char* description, FishType requirement, int requiredAmount, slQuestDifficulty difficulty)
+{
+	this->name = name;
+	this->description = description;
+	this->requirement = requirement;
+	this->requiredAmount = requiredAmount;
+	this->difficulty = difficulty;
+	this->reward = (static_cast<float>(requirement) + 1.0) * static_cast<float>(requiredAmount);
+}
+
 slQuests::slQuests()
 {
+	this->name = "";
+	this->description = "";
+	this->requirement = FishType::n_SIZE;
+	this->requiredAmount = -1;
+	this->difficulty = slQuestDifficulty::n_SIZE;
+	this->reward = (static_cast<float>(requirement) + 1.0) * static_cast<float>(requiredAmount);
 }
 
 slQuests::~slQuests()
@@ -14090,10 +14134,30 @@ slQuests::~slQuests()
 
 idStr slQuests::getName()
 {
-	return idStr();
+	return name;
+}
+
+idStr slQuests::getDescription()
+{
+	return description;
 }
 
 float slQuests::getReward()
 {
-	return 0.0f;
+	return reward;
+}
+
+int slQuests::getRequiredAmount()
+{
+	return requiredAmount;
+}
+
+FishType slQuests::getRequirement()
+{
+	return requirement;
+}
+
+slQuestDifficulty slQuests::getDifficulty()
+{
+	return difficulty;
 }
