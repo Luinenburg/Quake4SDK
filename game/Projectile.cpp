@@ -2179,14 +2179,6 @@ bool slFishingBobber::Collide(const trace_t& collision, const idVec3& velocity, 
 	idPlayer* player = gameLocal.GetLocalPlayer();
 	const idMaterial* contactMaterial = collision.c.material;
 
-	gameLocal.Printf("FishingSpot: %i\n", FishingSpotFromMaterial(contactMaterial));
-	if (collision.c.material->GetMaterialType()) {
-		gameLocal.Printf("MaterialType: %s\n", contactMaterial->GetMaterialType()->GetName());
-	}
-	else {
-		if (collision.c.material->GetFileName()) gameLocal.Printf("%s\n", contactMaterial->GetFileName());
-		if (collision.c.material->GetName()) gameLocal.Printf("%s\n", contactMaterial->GetName());
-	}
 	FishType fishReceived = FishingSpotFromMaterial(contactMaterial);
 	player->giveFish(fishReceived);
 
