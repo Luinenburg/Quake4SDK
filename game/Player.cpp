@@ -14162,6 +14162,13 @@ idList<slEnhancements> idPlayer::GetOwnedEnhancements()
 	return ownedEnhancements;
 }
 
+bool idPlayer::BuyEnhancement(slEnhancements enhancement, float bal)
+{
+	if (bal > buyMenuCash) return false;
+	buyMenuCash -= bal;
+	return (GrantEnhancement(enhancement));
+}
+
 /**
  * Checks to see if the player can accept this item in their inventory
  *
@@ -14197,7 +14204,7 @@ slQuests generateQuest(slQuestDifficulty difficulty, bool easyQuests) {
 		return slQuests(
 			"EQ",
 			"Easy Quest",
-			static_cast<FishType>(gameLocal.random.RandomInt(1)),
+			static_cast<FishType>(gameLocal.random.RandomInt(1)), // 0, 1
 			amount+2,
 			slQuestDifficulty::EASY
 		);
@@ -14205,7 +14212,7 @@ slQuests generateQuest(slQuestDifficulty difficulty, bool easyQuests) {
 		return slQuests(
 			"MQ",
 			"Medium Quest",
-			static_cast<FishType>(gameLocal.random.RandomInt(2) + 1),
+			static_cast<FishType>(gameLocal.random.RandomInt(2) + 1), // 1, 2, 3
 			amount+4,
 			slQuestDifficulty::EASY
 		);
@@ -14213,7 +14220,7 @@ slQuests generateQuest(slQuestDifficulty difficulty, bool easyQuests) {
 		return slQuests(
 			"HQ",
 			"Hard Quest",
-			static_cast<FishType>(gameLocal.random.RandomInt(2) + 2),
+			static_cast<FishType>(gameLocal.random.RandomInt(1) + 3), // 3, 4
 			amount+6,
 			slQuestDifficulty::EASY
 		);
@@ -14239,7 +14246,7 @@ slQuests::slQuests()
 	this->requirement = FishType::FISH_SIZE;
 	this->requiredAmount = -1;
 	this->difficulty = slQuestDifficulty::QUEST_SIZE;
-	this->reward = (static_cast<float>(requirement) + 1.0) * static_cast<float>(requiredAmount);
+	this->reward = -1;
 }
 
 slQuests::~slQuests()

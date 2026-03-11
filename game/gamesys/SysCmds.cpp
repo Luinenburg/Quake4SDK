@@ -3029,7 +3029,7 @@ void Cmd_ShuffleTeams_f( const idCmdArgs& args ) {
 FishType idStrToFish(idStr input) {
 	if (input.Cmp("ugly")==0) return FishType::UGLY;
 	if (input.Cmp("dirty")==0) return FishType::DIRTY;
-	if (input.Cmp("metallic")==0) return FishType::UGLY;
+	if (input.Cmp("metallic")==0) return FishType::METALLIC;
 	if (input.Cmp("rocky")==0) return FishType::ROCKY;
 	if (input.Cmp("fleshy")==0) return FishType::FLESHY;
 	return FishType::FISH_SIZE;
@@ -3202,6 +3202,25 @@ void Cmd_UnequipEnhancement_f(const idCmdArgs& args) {
 	}
 	else {
 		gameLocal.Printf("An error occured.\n");
+	}
+}
+
+void Cmd_BuyEnhancement_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	slEnhancements enhancement = strToEnhancement(args.Argv(1));
+	if (player->BuyEnhancement(enhancement, static_cast<int>(enhancement)*20)) {
+		gameLocal.Printf("Purchase complete.\n");
+	}
+	else {
+		gameLocal.Printf("An error has occured.\n");
+	}
+}
+
+void Cmd_ShowEnhancementCost_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	for (int i = 1; i < slEnhancements::ENHANCEMENT_SIZE; i++) {
+		slEnhancements enhancement = static_cast<slEnhancements>(i);
+		gameLocal.Printf("%s: %d\n", enhancementToStr(enhancement), static_cast<int>(enhancement)*20);
 	}
 }
 
@@ -3433,6 +3452,8 @@ void idGameLocal::InitConsoleCommands(void) {
 	cmdSystem->AddCommand("equipEnhancement", Cmd_EquipEnhancement_f, CMD_FL_GAME | CMD_FL_CHEAT, "Equip an enhancement");
 	cmdSystem->AddCommand("unequipEnhancement", Cmd_UnequipEnhancement_f, CMD_FL_GAME | CMD_FL_CHEAT, "Unequip an enhancement");
 
+	cmdSystem->AddCommand("buyEnhancement", Cmd_BuyEnhancement_f, CMD_FL_GAME | CMD_FL_CHEAT, "Unequip an enhancement");
+	cmdSystem->AddCommand("showEnhancementCost", Cmd_ShowEnhancementCost_f, CMD_FL_GAME | CMD_FL_CHEAT, "Unequip an enhancement");
 }
 
 /*

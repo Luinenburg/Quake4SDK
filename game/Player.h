@@ -856,6 +856,7 @@ public:
 	bool					UnequipEnhancement(int slot);
 	slEnhancements			GetEquippedEnhancement(int slot);
 	idList<slEnhancements>  GetOwnedEnhancements();
+	bool					BuyEnhancement(slEnhancements enhancement, float bal);
 
 protected:
 	void					SetupHead( const char* modelKeyName = "", idVec3 headOffset = idVec3(0, 0, 0) );
