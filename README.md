@@ -93,7 +93,13 @@ We've got so many features! Thing to do! Theres
 		- god_fisher
 - equipEnhancement \<enhancement>
 	- Equips an owned enhancement to the first unequipped slot
-- unequipEnhancement \<enhancement>
+	- valid enhancement:
+		- more_fish
+		- more_money
+		- multi_fish
+		- easy_quests
+		- god_fisher
+- unequipEnhancement \<number>
 	- Unequips specified enhancement
 ## Shop
 - showEnhancementCost
