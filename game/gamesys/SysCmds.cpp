@@ -3029,7 +3029,7 @@ void Cmd_ShuffleTeams_f( const idCmdArgs& args ) {
 FishType idStrToFish(idStr input) {
 	if (input.Cmp("ugly")==0) return FishType::UGLY;
 	if (input.Cmp("dirty")==0) return FishType::DIRTY;
-	if (input.Cmp("metallic")==0) return FishType::UGLY;
+	if (input.Cmp("metallic")==0) return FishType::METALLIC;
 	if (input.Cmp("rocky")==0) return FishType::ROCKY;
 	if (input.Cmp("fleshy")==0) return FishType::FLESHY;
 	return FishType::FISH_SIZE;
@@ -3133,6 +3133,94 @@ void Cmd_DisplayQuest_f(const idCmdArgs& args) {
 			player->getQuest().getRequiredAmount(),
 			player->getQuest().getReward()
 		);
+	}
+}
+
+const char* enhancementToStr(slEnhancements enhancement) {
+	switch (enhancement) {
+	case slEnhancements::UNEQUIPPED: return "unequipped";
+	case slEnhancements::EASY_QUESTS: return "easy_quests";
+	case slEnhancements::GOD_FISHER: return "god_fisher";
+	case slEnhancements::MORE_FISH: return "more_fish";
+	case slEnhancements::MULTI_FISH: return "multi_fish";
+	case slEnhancements::MORE_MONEY: return "more_money";
+	}
+	return "error";
+}
+
+slEnhancements strToEnhancement(idStr enhancement) {
+	if (enhancement.Cmp("unequipped") == 0) return slEnhancements::UNEQUIPPED;
+	if (enhancement.Cmp("easy_quests") == 0) return slEnhancements::EASY_QUESTS;
+	if (enhancement.Cmp("god_fisher") == 0) return slEnhancements::GOD_FISHER;
+	if (enhancement.Cmp("more_fish") == 0) return slEnhancements::MORE_FISH;
+	if (enhancement.Cmp("multi_fish") == 0) return slEnhancements::MULTI_FISH;
+	if (enhancement.Cmp("more_money") == 0) return slEnhancements::MORE_MONEY;
+	return slEnhancements::ENHANCEMENT_SIZE;
+}
+
+void Cmd_DisplayEquippedEnhancements_f(const idCmdArgs& args) {
+	idPlayer* player;
+	player = gameLocal.GetLocalPlayer();
+	for (int i = 0; i < 3; i++) {
+		gameLocal.Printf("%d: %s\n", i, enhancementToStr(player->GetEquippedEnhancement(i)));
+	}
+}
+
+void Cmd_DisplayOwnedEnhancements_f(const idCmdArgs& args) {
+	idPlayer* player;
+	player = gameLocal.GetLocalPlayer();
+	for (int i = 0; i < player->GetOwnedEnhancements().Num(); i++) {
+		gameLocal.Printf("%d: %s\n", i, enhancementToStr(player->GetOwnedEnhancements()[i]));
+	}
+}
+
+void Cmd_GiveEnhancement_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player->GrantEnhancement(strToEnhancement(args.Argv(1)))) {
+		gameLocal.Printf("Completed.\n");
+	}
+	else {
+		gameLocal.Printf("An error occured.\n");
+	}
+}
+
+void Cmd_EquipEnhancement_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	if (player->EquipEnhancement(strToEnhancement(args.Argv(1)))) {
+		gameLocal.Printf("Completed.\n");
+	}
+	else {
+		gameLocal.Printf("An error occured.\n");
+	}
+}
+
+void Cmd_UnequipEnhancement_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	int slot = atoi(args.Argv(1));
+	if (player->UnequipEnhancement(slot)) {
+		gameLocal.Printf("Completed.\n");
+	}
+	else {
+		gameLocal.Printf("An error occured.\n");
+	}
+}
+
+void Cmd_BuyEnhancement_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	slEnhancements enhancement = strToEnhancement(args.Argv(1));
+	if (player->BuyEnhancement(enhancement, static_cast<int>(enhancement)*20)) {
+		gameLocal.Printf("Purchase complete.\n");
+	}
+	else {
+		gameLocal.Printf("An error has occured.\n");
+	}
+}
+
+void Cmd_ShowEnhancementCost_f(const idCmdArgs& args) {
+	idPlayer* player = gameLocal.GetLocalPlayer();
+	for (int i = 1; i < slEnhancements::ENHANCEMENT_SIZE; i++) {
+		slEnhancements enhancement = static_cast<slEnhancements>(i);
+		gameLocal.Printf("%s: %d\n", enhancementToStr(enhancement), static_cast<int>(enhancement)*20);
 	}
 }
 
@@ -3351,12 +3439,21 @@ void idGameLocal::InitConsoleCommands(void) {
 	cmdSystem->AddCommand("giveFish", Cmd_GiveFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "Give you fish!");
 	cmdSystem->AddCommand("takeFish", Cmd_TakeFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "Give god fish!");
 	cmdSystem->AddCommand("displayFish", Cmd_DisplayFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "See your fish.");
-	cmdSystem->AddCommand("sellFish", Cmd_SellFish_f, CMD_FL_GAME | CMD_FL_CHEAT, "Sell yo fish");
 
 	// Quests
 	cmdSystem->AddCommand("FindQuest", Cmd_GiveQuest_f, CMD_FL_GAME | CMD_FL_CHEAT, "Get a quest");
 	cmdSystem->AddCommand("SubmitQuest", Cmd_SubmitQuest_f, CMD_FL_GAME | CMD_FL_CHEAT, "Submit your quest");
 	cmdSystem->AddCommand("ShowQuest", Cmd_DisplayQuest_f, CMD_FL_GAME | CMD_FL_CHEAT, "View current quest");
+
+	// Enhancements
+	cmdSystem->AddCommand("ShowOwnedEnhancements", Cmd_DisplayOwnedEnhancements_f, CMD_FL_GAME | CMD_FL_CHEAT, "View owned enhancements");
+	cmdSystem->AddCommand("ShowEquippedEnhancements", Cmd_DisplayEquippedEnhancements_f, CMD_FL_GAME | CMD_FL_CHEAT, "View equipped enhancements");
+	cmdSystem->AddCommand("grantEnhancement", Cmd_GiveEnhancement_f, CMD_FL_GAME | CMD_FL_CHEAT, "Give player an enhancement");
+	cmdSystem->AddCommand("equipEnhancement", Cmd_EquipEnhancement_f, CMD_FL_GAME | CMD_FL_CHEAT, "Equip an enhancement");
+	cmdSystem->AddCommand("unequipEnhancement", Cmd_UnequipEnhancement_f, CMD_FL_GAME | CMD_FL_CHEAT, "Unequip an enhancement");
+
+	cmdSystem->AddCommand("buyEnhancement", Cmd_BuyEnhancement_f, CMD_FL_GAME | CMD_FL_CHEAT, "Unequip an enhancement");
+	cmdSystem->AddCommand("showEnhancementCost", Cmd_ShowEnhancementCost_f, CMD_FL_GAME | CMD_FL_CHEAT, "Unequip an enhancement");
 }
 
 /*

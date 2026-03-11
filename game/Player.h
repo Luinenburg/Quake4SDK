@@ -295,7 +295,17 @@ private:
 	slQuestDifficulty difficulty;
 };
 
-slQuests generateQuest(slQuestDifficulty difficulty);
+slQuests generateQuest(slQuestDifficulty difficulty, bool hasEasyQuests);
+
+enum slEnhancements {
+	UNEQUIPPED,
+	MORE_FISH,
+	MORE_MONEY,
+	MULTI_FISH,
+	EASY_QUESTS,
+	GOD_FISHER,
+	ENHANCEMENT_SIZE
+};
 
 class idPlayer : public idActor {
 public:
@@ -837,11 +847,21 @@ public:
 	bool					FindQuest(slQuestDifficulty difficulty);
 	slQuests				getQuest();
 
+	//Enhancements
+	bool					HasEnhancementOwned(slEnhancements enhancement);
+	bool					HasEnhancementEquipped(slEnhancements enhancement);
+	bool					GrantEnhancement(slEnhancements enhancement);
+	bool					EquipEnhancement(slEnhancements enhancement);
+	bool					SwapEnhancement(slEnhancements enhancement, int slot);
+	bool					UnequipEnhancement(int slot);
+	slEnhancements			GetEquippedEnhancement(int slot);
+	idList<slEnhancements>  GetOwnedEnhancements();
+	bool					BuyEnhancement(slEnhancements enhancement, float bal);
+
 protected:
 	void					SetupHead( const char* modelKeyName = "", idVec3 headOffset = idVec3(0, 0, 0) );
 
 private:
-	slQuests				currentQuest;
 	float					vehicleCameraDist;
 
 	jointHandle_t			hipJoint;
@@ -1049,6 +1069,13 @@ private:
 
 	// FISH
 	int						Fish[FishType::FISH_SIZE];
+
+	// Quests
+	slQuests				currentQuest;
+
+	// Enhancement
+	slEnhancements			equippedEnhancements[3];
+	idList<slEnhancements>	ownedEnhancements;
 
 	bool					WantSmoothing( void ) const;
 	void					PredictionErrorDecay( void );
